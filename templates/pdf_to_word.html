@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF → Word 转换 - 办公效率工具集</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <a href="/" class="back-link">← 返回工具集</a>
+    <h1>📄 PDF 转 Word</h1>
+    <p class="page-desc">将 PDF 文件转换为 Word (.docx) 格式，便于编辑和修改。<br>
+    采用 <strong>pdf2docx</strong> 引擎，保留文本内容、段落结构、表格等元素。<br>
+    如为扫描件（图片型 PDF），请勾选下方 <strong>启用 OCR</strong>。</p>
+
+    <div class="ocr-option">
+        <label class="ocr-toggle">
+            <input type="checkbox" id="useOcr">
+            <span class="ocr-label">启用 OCR（扫描件模式）</span>
+        </label>
+        <p class="ocr-hint" id="ocrHint">未勾选：使用 pdf2docx 直接提取文本层（仅含文字的 PDF）</p>
+    </div>
+
+    <div class="upload-zone" id="dropZone">
+        <div class="upload-icon">📂</div>
+        <p class="upload-text">拖放 PDF 文件到此处</p>
+        <p class="upload-hint">或点击选择文件</p>
+        <input type="file" id="fileInput" accept=".pdf" hidden>
+    </div>
+
+    <div id="fileInfo" class="file-info hidden">
+        <span id="fileName"></span>
+        <span id="fileSize"></span>
+        <button id="removeBtn" class="btn-remove">✕</button>
+    </div>
+
+    <button id="convertBtn" class="btn btn-primary hidden">开始转换</button>
+
+    <div id="progress" class="progress hidden">
+        <div class="progress-bar" id="progressBar"></div>
+        <p id="statusText">转换中，请稍候...</p>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+
+    <div id="result" class="result hidden">
+        <p>✅ 转换完成！</p>
+        <a id="downloadLink" class="btn btn-success" download>下载 DOCX</a>
+    </div>
+
+    <div class="note">
+        <h3>📋 说明</h3>
+        <ul>
+            <li>支持最大 500MB 的文件</li>
+            <li>转换保留文本内容、段落结构、表格、简单格式</li>
+            <li>复杂排版（图文混排、旋转文字、特殊字体）可能无法完美还原</li>
+            <li>文件仅用于转换，不会被永久存储（30分钟后自动清理）</li>
+            <li>建议先用小文件测试效果</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+(() => {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeBtn = document.getElementById('removeBtn');
+    const convertBtn = document.getElementById('convertBtn');
+    const progress = document.getElementById('progress');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const errorDiv = document.getElementById('error');
+    const resultDiv = document.getElementById('result');
+    const downloadLink = document.getElementById('downloadLink');
+    const useOcr = document.getElementById('useOcr');
+    const ocrHint = document.getElementById('ocrHint');
+
+    let selectedFile = null;
+    let isConverting = false;
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function resetUI() {
+        hide(errorDiv);
+        hide(resultDiv);
+        hide(progress);
+        convertBtn.disabled = false;
+        convertBtn.textContent = '开始转换';
+        isConverting = false;
+    }
+
+    function show(el) { el.classList.remove('hidden'); }
+    function hide(el) { el.classList.add('hidden'); }
+
+    function handleFile(file) {
+        if (!file) return;
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+            showError('仅支持 .pdf 格式文件');
+            return;
+        }
+        selectedFile = file;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatSize(file.size);
+        show(fileInfo);
+        dropZone.classList.add('has-file');
+        show(convertBtn);
+        resetUI();
+    }
+
+    function showError(msg) {
+        errorDiv.textContent = msg;
+        show(errorDiv);
+        hide(resultDiv);
+        hide(progress);
+        convertBtn.disabled = false;
+        convertBtn.textContent = '开始转换';
+        isConverting = false;
+    }
+
+    // ── Drag & Drop ──
+    dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+    // ── Remove file ──
+    removeBtn.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        hide(fileInfo);
+        hide(convertBtn);
+        dropZone.classList.remove('has-file');
+        resetUI();
+    });
+
+    // ── OCR toggle 提示更新 ──
+    useOcr.addEventListener('change', () => {
+        if (useOcr.checked) {
+            ocrHint.textContent = '已勾选：使用 PaddleOCR (PP-OCRv6 tiny) 逐页识别，扫描件适用。最大 50MB / 100 页。';
+            ocrHint.classList.add('ocr-on');
+        } else {
+            ocrHint.textContent = '未勾选：使用 pdf2docx 直接提取文本层（仅含文字的 PDF）';
+            ocrHint.classList.remove('ocr-on');
+        }
+    });
+
+    // ── Convert ──
+    convertBtn.addEventListener('click', async () => {
+        if (!selectedFile || isConverting) return;
+        isConverting = true;
+        convertBtn.disabled = true;
+        hide(errorDiv);
+        hide(resultDiv);
+        progressBar.style.width = '0%';
+        show(progress);
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        try {
+            if (useOcr.checked) {
+                await _runOcrFlow(formData);
+            } else {
+                await _runDirectFlow(formData);
+            }
+        } catch (err) {
+            showError(err.message);
+        } finally {
+            isConverting = false;
+            convertBtn.disabled = false;
+            convertBtn.textContent = '开始转换';
+        }
+    });
+
+    // ── 同步流程（原 pdf2docx 路线） ──
+    async function _runDirectFlow(formData) {
+        convertBtn.textContent = '转换中...';
+        statusText.textContent = '上传文件中...';
+        progressBar.style.width = '10%';
+
+        const resp = await fetch('/api/convert/pdf-to-docx', {
+            method: 'POST',
+            body: formData,
+        });
+        progressBar.style.width = '80%';
+        statusText.textContent = '转换中...';
+
+        if (!resp.ok) {
+            const data = await resp.json().catch(() => ({}));
+            throw new Error(data.error || `服务器错误 (${resp.status})`);
+        }
+
+        progressBar.style.width = '95%';
+        statusText.textContent = '准备下载...';
+
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const originalName = selectedFile.name.replace(/\.pdf$/i, '.docx');
+
+        progressBar.style.width = '100%';
+        statusText.textContent = '完成 ✅';
+
+        downloadLink.href = url;
+        downloadLink.download = originalName;
+        hide(progress);
+        show(resultDiv);
+    }
+
+    // ── 异步流程（OCR 路线，轮询 status） ──
+    async function _runOcrFlow(formData) {
+        convertBtn.textContent = 'OCR 识别中...';
+        statusText.textContent = '上传文件中...';
+        progressBar.style.width = '5%';
+
+        // 1) 提交任务
+        const startResp = await fetch('/api/ocr/start', {
+            method: 'POST',
+            body: formData,
+        });
+        if (!startResp.ok) {
+            const data = await startResp.json().catch(() => ({}));
+            throw new Error(data.error || `提交失败 (${startResp.status})`);
+        }
+        const { task_id } = await startResp.json();
+        if (!task_id) throw new Error('未获取到 task_id');
+
+        // 2) 轮询状态
+        const POLL_INTERVAL = 1500;
+        const TIMEOUT_MS = 20 * 60 * 1000;  // 20 分钟
+        const startTime = Date.now();
+        let lastStatus = '';
+        let lastMessage = '';
+
+        while (true) {
+            if (Date.now() - startTime > TIMEOUT_MS) {
+                throw new Error('识别超时（>20分钟），请尝试更小的文件');
+            }
+            await new Promise(r => setTimeout(r, POLL_INTERVAL));
+
+            const statusResp = await fetch(`/api/ocr/status/${task_id}`);
+            if (!statusResp.ok) {
+                const data = await statusResp.json().catch(() => ({}));
+                throw new Error(data.error || `状态查询失败 (${statusResp.status})`);
+            }
+            const s = await statusResp.json();
+            lastStatus = s.status;
+            lastMessage = s.message || '';
+
+            if (s.status === 'failed') {
+                throw new Error(s.error || 'OCR 失败');
+            }
+            if (s.status === 'success') {
+                statusText.textContent = s.message || '识别完成';
+                progressBar.style.width = '100%';
+                break;
+            }
+
+            // 更新进度
+            if (s.total > 0) {
+                const pct = Math.min(95, 10 + (s.progress / s.total) * 85);
+                progressBar.style.width = pct + '%';
+            } else {
+                progressBar.style.width = '20%';
+            }
+            statusText.textContent = s.message || '处理中...';
+        }
+
+        // 3) 下载
+        statusText.textContent = '准备下载...';
+        const dlResp = await fetch(`/api/ocr/download/${task_id}`);
+        if (!dlResp.ok) {
+            const data = await dlResp.json().catch(() => ({}));
+            throw new Error(data.error || `下载失败 (${dlResp.status})`);
+        }
+        const blob = await dlResp.blob();
+        const url = URL.createObjectURL(blob);
+        const originalName = selectedFile.name.replace(/\.pdf$/i, '.docx');
+
+        progressBar.style.width = '100%';
+        statusText.textContent = '完成 ✅';
+
+        downloadLink.href = url;
+        downloadLink.download = originalName;
+        hide(progress);
+        show(resultDiv);
+    }
+})();
+</script>
+</body>
+</html>

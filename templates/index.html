@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>办公效率工具集</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+<h1>🛠 办公效率工具集</h1>
+<div class="tool-grid">
+    <a href="/xls-to-xlsx" class="tool-card">
+        <div class="tool-icon">📊</div>
+        <div class="tool-name">XLS → XLSX 转换</div>
+        <div class="tool-desc">将 Excel 97-2003 (.xls) 文件转换为现代 Excel (.xlsx) 格式，完整保留内容、格式、图片</div>
+    </a>
+    <a href="/pdf-to-word" class="tool-card">
+        <div class="tool-icon">📄</div>
+        <div class="tool-name">PDF → Word 转换</div>
+        <div class="tool-desc">将 PDF 文件转换为 Word (.docx) 格式，保留文本内容、段落结构、表格等元素</div>
+    </a>
+</div>
+</div>
+</body>
+</html>

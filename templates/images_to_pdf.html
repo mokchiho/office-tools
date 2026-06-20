@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.images_to_pdf.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.images_to_pdf.title,
+        description=seo_meta.images_to_pdf.description,
+        keywords=seo_meta.images_to_pdf.keywords,
+        path=seo_meta.images_to_pdf.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.images_to_pdf.title.split(' - ')[0], 'url': seo_meta.images_to_pdf.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon image">📑</div>
+            图片转 PDF
+        </h1>
+        <p class="page-desc">将多张图片合并为一个 PDF 文件，<strong>每张图片一页</strong>。<br>
+        支持 JPG / PNG / WebP / BMP / GIF / TIFF 格式，最多 10 张。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放图片文件到此处</p>
+            <p class="upload-hint">或点击选择文件（支持多选）</p>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,.tiff" multiple hidden>
+        </div>
+
+        <div id="fileList" class="file-list hidden"></div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始生成 PDF
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">生成中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ PDF 生成完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载 PDF</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>支持格式：JPG / JPEG / PNG / WebP / BMP / GIF / TIFF</li>
+                <li>每张图片生成一页，按列表顺序排列</li>
+                <li>最多支持 <strong>10 张图片</strong></li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "可以放多少张图片?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "最多支持 10 张图片,每张图片将作为 PDF 的一页,按上传顺序排列。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "可以调整图片顺序吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以。上传后可拖拽卡片调整顺序,转换后 PDF 将按调整后的顺序输出。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持哪些图片格式?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持 JPG/PNG/WebP 三种主流格式,不同格式可混合上传。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "PDF 分辨率是多少?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "默认 A4 纸张大小,图片自动缩放适应页面,保持原始比例。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/image-compress" class="related-tool-card">
+            <span class="related-tool-icon">🖼️</span>
+            <span class="related-tool-name">图片压缩</span>
+        </a>
+        <a href="/image-convert" class="related-tool-card">
+            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-name">图片格式转换</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFiles = [];
+        let isConverting = false;
+        const MAX_FILES = 10;
+        const IMG_EXTS = ['.jpg','.jpeg','.png','.webp','.bmp','.gif','.tiff'];
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            selectedFiles.forEach((f, i) => {
+                const item = document.createElement('div');
+                item.className = 'file-list-item';
+                item.innerHTML = `
+                    <span class="file-list-index">${i + 1}</span>
+                    <span class="file-list-name">${f.name}</span>
+                    <span class="file-list-size">${formatSize(f.size)}</span>
+                    <button class="file-list-remove">✕</button>
+                `;
+                item.querySelector('.file-list-remove').addEventListener('click', () => {
+                    selectedFiles.splice(i, 1);
+                    if (selectedFiles.length === 0) { hide(fileList); hide(convertBtn); dropZone.classList.remove('has-file'); }
+                    else renderFileList();
+                });
+                fileList.appendChild(item);
+            });
+        }
+
+        function addFiles(files) {
+            const valid = [];
+            for (const f of files) {
+                const ext = '.' + f.name.split('.').pop().toLowerCase();
+                if (!IMG_EXTS.includes(ext)) continue;
+                if (selectedFiles.some(e => e.name === f.name && e.size === f.size)) continue;
+                valid.push(f);
+            }
+            if (valid.length === 0) { showError('未添加有效图片文件'); return; }
+            if (selectedFiles.length + valid.length > MAX_FILES) { showError(`最多支持 ${MAX_FILES} 张图片`); return; }
+            selectedFiles = selectedFiles.concat(valid);
+            renderFileList();
+            show(fileList);
+            show(convertBtn);
+            dropZone.classList.add('has-file');
+        }
+
+        function showError(msg) { errorDiv.textContent = msg; show(errorDiv); hide(resultDiv); }
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files)); });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => { addFiles(Array.from(fileInput.files)); fileInput.value = ''; });
+
+        convertBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0 || isConverting) return;
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 生成中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+
+            const formData = new FormData();
+            for (const f of selectedFiles) formData.append('files', f);
+
+            try {
+                const resp = await fetch('/api/convert/images-to-pdf', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                if (!resp.ok) throw new Error('生成失败');
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+                downloadLink.href = url;
+                downloadLink.download = `combined_${Date.now()}.pdf`;
+                hide(progress);
+                show(resultDiv);
+            } catch (err) { showError(err.message); } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始生成 PDF';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

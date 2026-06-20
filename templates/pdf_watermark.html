@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_watermark.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_watermark.title,
+        description=seo_meta.pdf_watermark.description,
+        keywords=seo_meta.pdf_watermark.keywords,
+        path=seo_meta.pdf_watermark.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_watermark.title.split(' - ')[0], 'url': seo_meta.pdf_watermark.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon pdf">💧</div>
+            PDF 加水印
+        </h1>
+        <p class="page-desc">为 PDF 文件添加<strong>平铺文字水印</strong>，支持自定义字体大小、透明度和旋转角度。<br>
+        适用于标记文档为"机密"、"草稿"或添加版权信息。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放 PDF 文件到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <div id="params" class="param-group hidden" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
+            <label class="input-label" style="display:block;font-size:14px;font-weight:600;color:#334155;margin-bottom:12px;">水印设置</label>
+            
+            <div class="input-group" style="margin-bottom:16px;">
+                <label class="input-label">水印文字</label>
+                <input type="text" id="watermarkText" class="tool-input" placeholder="例如：机密、草稿、版权所有" style="width:100%;padding:12px 16px;font-size:14px;border:2px solid #e2e8f0;border-radius:10px;outline:none;">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>字体大小</span>
+                    <span class="slider-value" id="fontSizeValue">40px</span>
+                </div>
+                <input type="range" id="fontSize" min="10" max="200" value="40">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>透明度</span>
+                    <span class="slider-value" id="opacityValue">30%</span>
+                </div>
+                <input type="range" id="opacity" min="5" max="100" value="30">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>旋转角度</span>
+                    <span class="slider-value" id="rotationValue">45°</span>
+                </div>
+                <input type="range" id="rotation" min="-90" max="90" value="45">
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 添加水印
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">处理中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 水印添加完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载水印 PDF</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li><strong>平铺水印：</strong>水印文字会在每页重复排列</li>
+                <li><strong>透明度：</strong>建议 20-40%，既清晰可见又不遮挡正文</li>
+                <li>最大支持 200MB 的 PDF 文件</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "水印是平铺的吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "是的,默认对角线平铺,覆盖整个页面,既起到保护作用又不影响阅读。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "可以自定义水印吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以自定义文字、字体、大小、颜色、透明度、旋转角度等参数。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "水印能被去除吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "本工具生成的是平铺水印,无法被简单的编辑去除。如需更高级保护请配合 PDF 加密使用。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持中文水印吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。可输入任意 Unicode 字符,包括中文、表情符号等。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-encrypt" class="related-tool-card">
+            <span class="related-tool-icon">🔒</span>
+            <span class="related-tool-name">PDF 加密/解密</span>
+        </a>
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/images-to-pdf" class="related-tool-card">
+            <span class="related-tool-icon">📑</span>
+            <span class="related-tool-name">图片转 PDF</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const params = document.getElementById('params');
+        const watermarkText = document.getElementById('watermarkText');
+        const fontSize = document.getElementById('fontSize');
+        const opacity = document.getElementById('opacity');
+        const rotation = document.getElementById('rotation');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const opacityValue = document.getElementById('opacityValue');
+        const rotationValue = document.getElementById('rotationValue');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let isConverting = false;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function handleFile(file) {
+            if (!file || !file.name.toLowerCase().endsWith('.pdf')) return;
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            show(fileInfo);
+            show(params);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+        }
+
+        fontSize.addEventListener('input', () => fontSizeValue.textContent = fontSize.value + 'px');
+        opacity.addEventListener('input', () => opacityValue.textContent = opacity.value + '%');
+        rotation.addEventListener('input', () => rotationValue.textContent = rotation.value + '°');
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+        removeBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            hide(fileInfo);
+            hide(params);
+            hide(convertBtn);
+            dropZone.classList.remove('has-file');
+        });
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || isConverting) return;
+            const text = watermarkText.value.trim();
+            if (!text) { errorDiv.textContent = '请输入水印文字'; show(errorDiv); return; }
+
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 处理中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('text', text);
+            formData.append('font_size', fontSize.value);
+            formData.append('opacity', (opacity.value / 100).toFixed(2));
+            formData.append('rotation', rotation.value);
+
+            try {
+                const resp = await fetch('/api/convert/pdf-watermark', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                if (!resp.ok) throw new Error('处理失败');
+
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+
+                downloadLink.href = url;
+                downloadLink.download = 'watermarked.pdf';
+                hide(progress);
+                show(resultDiv);
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                show(errorDiv);
+            } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 添加水印';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

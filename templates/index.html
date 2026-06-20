@@ -1,26 +1,389 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>办公效率工具集</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>办公效率工具集 - 免费在线PDF/图片/编码转换工具</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.index.title,
+        description=seo_meta.index.description,
+        keywords=seo_meta.index.keywords,
+        path=seo_meta.index.path,
+        jsonld_type='WebSite'
+    ) }}
+    {# ItemList JSON-LD: 列出全部工具 #}
+    {% set tool_items = [] %}
+    {% for slug, meta in seo_meta.items() %}
+        {% if slug != 'index' %}
+            {% set _ = tool_items.append({
+                '@type': 'ListItem',
+                'position': loop.index,
+                'name': meta.title.split(' - ')[0],
+                'description': meta.description,
+                'url': site_url ~ meta.path
+            }) %}
+        {% endif %}
+    {% endfor %}
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "办公效率工具集 - 全部在线工具",
+  "description": "免费、免注册的在线办公工具集合。",
+  "numberOfItems": {{ tool_items | length }},
+  "itemListElement": {{ tool_items | tojson }}
+}
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
 </head>
 <body>
-<div class="container">
-<h1>🛠 办公效率工具集</h1>
-<div class="tool-grid">
-    <a href="/xls-to-xlsx" class="tool-card">
-        <div class="tool-icon">📊</div>
-        <div class="tool-name">XLS → XLSX 转换</div>
-        <div class="tool-desc">将 Excel 97-2003 (.xls) 文件转换为现代 Excel (.xlsx) 格式，完整保留内容、格式、图片</div>
-    </a>
-    <a href="/pdf-to-word" class="tool-card">
-        <div class="tool-icon">📄</div>
-        <div class="tool-name">PDF → Word 转换</div>
-        <div class="tool-desc">将 PDF 文件转换为 Word (.docx) 格式，保留文本内容、段落结构、表格等元素</div>
-    </a>
-</div>
-</div>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="帮助">❓</button>
+        </div>
+    </nav>
+
+    <!-- 页面头部 -->
+    <div class="page-header">
+        <h1>🧰 办公效率工具集</h1>
+        <p>免费的在线办公工具集合，PDF转换、图片处理、数据转换等，<br>无需下载，随时随地使用，保护您的隐私安全。</p>
+    </div>
+
+    <!-- 分类标签 -->
+    <div class="container">
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="all">
+                <span class="category-tab-icon">✨</span> 全部工具
+            </button>
+            <button class="category-tab" data-category="pdf">
+                <span class="category-tab-icon">📄</span> PDF 工具
+            </button>
+            <button class="category-tab" data-category="excel">
+                <span class="category-tab-icon">📊</span> Excel/CSV
+            </button>
+            <button class="category-tab" data-category="image">
+                <span class="category-tab-icon">🖼️</span> 图片处理
+            </button>
+            <button class="category-tab" data-category="code">
+                <span class="category-tab-icon">💻</span> 编码转换
+            </button>
+            <button class="category-tab" data-category="qrcode">
+                <span class="category-tab-icon">📱</span> 二维码
+            </button>
+        </div>
+
+        <!-- 工具网格 -->
+        <div class="tool-grid" id="toolGrid">
+            <!-- PDF 工具 -->
+            <a href="/pdf-to-word" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon pdf">📄</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 转 Word</div>
+                        <div class="tool-desc">将 PDF 转换为可编辑的 Word 文档，支持 OCR 识别扫描件</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">🔥 热门</span>
+                    <span>PDF → DOCX</span>
+                </div>
+            </a>
+
+            <a href="/pdf-merge" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon pdf">📚</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 合并</div>
+                        <div class="tool-desc">将多个 PDF 文件合并为一个，支持拖拽调整顺序</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">推荐</span>
+                    <span>多文件合并</span>
+                </div>
+            </a>
+
+            <a href="/pdf-split" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon pdf">✂️</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 拆分</div>
+                        <div class="tool-desc">从 PDF 中提取指定页面，生成新的 PDF 文件</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>按页码提取</span>
+                </div>
+            </a>
+
+            <a href="/pdf-compress" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon pdf">📦</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 压缩</div>
+                        <div class="tool-desc">通过图像降采样减小 PDF 体积，适合扫描件优化</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">省空间</span>
+                    <span>三档压缩</span>
+                </div>
+            </a>
+
+            <a href="/pdf-watermark" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon pdf">💧</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 加水印</div>
+                        <div class="tool-desc">为 PDF 添加平铺文字水印，支持自定义字体、大小、透明度</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>版权保护</span>
+                </div>
+            </a>
+
+            <a href="/pdf-encrypt" class="tool-card" data-category="pdf">
+                <div class="tool-card-header">
+                    <div class="tool-icon security">🔒</div>
+                    <div class="tool-info">
+                        <div class="tool-name">PDF 加密/解密</div>
+                        <div class="tool-desc">为 PDF 设置密码保护或移除密码限制，保护文档安全</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>AES 加密</span>
+                </div>
+            </a>
+
+            <!-- Excel/CSV 工具 -->
+            <a href="/xls-to-xlsx" class="tool-card" data-category="excel">
+                <div class="tool-card-header">
+                    <div class="tool-icon excel">📊</div>
+                    <div class="tool-info">
+                        <div class="tool-name">XLS 转 XLSX</div>
+                        <div class="tool-desc">将 Excel 97-2003 格式转换为现代格式，完整保留格式和图片</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">必备</span>
+                    <span>格式升级</span>
+                </div>
+            </a>
+
+            <a href="/csv-excel" class="tool-card" data-category="excel">
+                <div class="tool-card-header">
+                    <div class="tool-icon excel">🔄</div>
+                    <div class="tool-info">
+                        <div class="tool-name">CSV ↔ Excel 转换</div>
+                        <div class="tool-desc">CSV 与 Excel 互相转换，自动识别编码，解决中文乱码</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">解决乱码</span>
+                    <span>编码自动检测</span>
+                </div>
+            </a>
+
+            <!-- 图片处理工具 -->
+            <a href="/image-compress" class="tool-card" data-category="image">
+                <div class="tool-card-header">
+                    <div class="tool-icon image">🖼️</div>
+                    <div class="tool-info">
+                        <div class="tool-name">图片压缩</div>
+                        <div class="tool-desc">压缩 JPG/PNG/WebP 图片，自定义质量和尺寸，减少文件大小</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">省空间</span>
+                    <span>智能压缩</span>
+                </div>
+            </a>
+
+            <a href="/image-convert" class="tool-card" data-category="image">
+                <div class="tool-card-header">
+                    <div class="tool-icon image">🔄</div>
+                    <div class="tool-info">
+                        <div class="tool-name">图片格式转换</div>
+                        <div class="tool-desc">在 JPG/PNG/WebP/BMP/GIF/TIFF 格式间自由转换</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>多格式支持</span>
+                </div>
+            </a>
+
+            <a href="/images-to-pdf" class="tool-card" data-category="image">
+                <div class="tool-card-header">
+                    <div class="tool-icon image">📑</div>
+                    <div class="tool-info">
+                        <div class="tool-name">图片转 PDF</div>
+                        <div class="tool-desc">将多张图片合并为一个 PDF 文件，每张图片一页</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>最多10张</span>
+                </div>
+            </a>
+
+            <!-- 编码转换工具 -->
+            <a href="/hash-check" class="tool-card" data-category="code">
+                <div class="tool-card-header">
+                    <div class="tool-icon security">🔐</div>
+                    <div class="tool-info">
+                        <div class="tool-name">文件哈希校验</div>
+                        <div class="tool-desc">计算文件的 MD5/SHA1/SHA256/SHA512 哈希值，验证文件完整性</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">本地计算</span>
+                    <span>不上传</span>
+                </div>
+            </a>
+
+            <a href="/base64" class="tool-card" data-category="code">
+                <div class="tool-card-header">
+                    <div class="tool-icon code">🔤</div>
+                    <div class="tool-info">
+                        <div class="tool-name">Base64 编解码</div>
+                        <div class="tool-desc">文本与 Base64 互转，支持 UTF-8 中文编码</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>UTF-8 支持</span>
+                </div>
+            </a>
+
+            <a href="/json-tool" class="tool-card" data-category="code">
+                <div class="tool-card-header">
+                    <div class="tool-icon code">{ }</div>
+                    <div class="tool-info">
+                        <div class="tool-name">JSON 格式化</div>
+                        <div class="tool-desc">JSON 美化、压缩、校验，定位语法错误位置</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">开发者</span>
+                    <span>本地处理</span>
+                </div>
+            </a>
+
+            <a href="/timestamp" class="tool-card" data-category="code">
+                <div class="tool-card-header">
+                    <div class="tool-icon code">⏱</div>
+                    <div class="tool-info">
+                        <div class="tool-name">时间戳转换</div>
+                        <div class="tool-desc">Unix 时间戳与日期时间互转，支持秒/毫秒自动识别</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>双向转换</span>
+                </div>
+            </a>
+
+            <!-- 二维码工具 -->
+            <a href="/qrcode" class="tool-card" data-category="qrcode">
+                <div class="tool-card-header">
+                    <div class="tool-icon tool">📱</div>
+                    <div class="tool-info">
+                        <div class="tool-name">二维码生成</div>
+                        <div class="tool-desc">生成文本/网址/WiFi/邮箱/电话等多种二维码，支持 PNG 和 SVG 下载</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">🔥多功能</span>
+                    <span>矢量输出</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const toolCards = document.querySelectorAll('.tool-card');
+
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 切换激活状态
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const category = tab.dataset.category;
+                
+                // 过滤显示
+                toolCards.forEach(card => {
+                    if (category === 'all') {
+                        card.style.display = 'flex';
+                        card.style.animation = 'fadeInUp 0.4s ease forwards';
+                    } else if (card.dataset.category === category) {
+                        card.style.display = 'flex';
+                        card.style.animation = 'fadeInUp 0.4s ease forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // ── 搜索功能 ──
+        const searchInput = document.getElementById('searchInput');
+        
+        searchInput.addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase().trim();
+            
+            toolCards.forEach(card => {
+                const name = card.querySelector('.tool-name').textContent.toLowerCase();
+                const desc = card.querySelector('.tool-desc').textContent.toLowerCase();
+                
+                if (!keyword || name.includes(keyword) || desc.includes(keyword)) {
+                    card.style.display = 'flex';
+                    card.style.animation = 'fadeInUp 0.4s ease forwards';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // 搜索时清除分类选中状态
+            if (keyword) {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+            }
+        });
+
+        // ── 回车搜索 ──
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const keyword = searchInput.value.toLowerCase().trim();
+                
+                toolCards.forEach(card => {
+                    const name = card.querySelector('.tool-name').textContent.toLowerCase();
+                    const desc = card.querySelector('.tool-desc').textContent.toLowerCase();
+                    
+                    if (name.includes(keyword) || desc.includes(keyword)) {
+                        card.style.display = 'flex';
+                    }
+                });
+            }
+        });
+    </script>
+
+    {% include '_footer.html' %}
 </body>
 </html>

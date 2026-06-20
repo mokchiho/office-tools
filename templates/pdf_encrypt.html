@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_encrypt.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_encrypt.title,
+        description=seo_meta.pdf_encrypt.description,
+        keywords=seo_meta.pdf_encrypt.keywords,
+        path=seo_meta.pdf_encrypt.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_encrypt.title.split(' - ')[0], 'url': seo_meta.pdf_encrypt.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon security">🔒</div>
+            PDF 加密/解密
+        </h1>
+        <p class="page-desc">为 PDF 文件<strong>设置密码保护</strong>或<strong>解除密码限制</strong>。<br>
+        加密后的 PDF 需要输入密码才能打开；解密后可移除密码限制。</p>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="encrypt">🔐 加密 PDF</button>
+            <button class="mode-tab" data-mode="decrypt">🔓 解密 PDF</button>
+        </div>
+
+        <!-- 加密模式 -->
+        <div class="mode-content active" id="encryptMode">
+            <div class="upload-zone" id="encryptDropZone">
+                <div class="upload-icon">📂</div>
+                <p class="upload-text">拖放 PDF 文件到此处</p>
+                <p class="upload-hint">或点击选择文件</p>
+                <input type="file" id="encryptFileInput" accept=".pdf" hidden>
+            </div>
+
+            <div id="encryptFileInfo" class="file-info hidden">
+                <span id="encryptFileName"></span>
+                <span id="encryptFileSize"></span>
+                <button id="encryptRemoveBtn" class="btn-remove">✕</button>
+            </div>
+
+            <div id="encryptParams" class="hidden" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:16px;">
+                <div class="password-group">
+                    <label>🔑 打开密码（必填）</label>
+                    <input type="password" id="encryptPassword" placeholder="设置打开 PDF 所需的密码">
+                </div>
+                <div class="password-group">
+                    <label>🛡️ 所有者密码（可选）</label>
+                    <input type="password" id="ownerPassword" placeholder="用于控制编辑/打印权限">
+                    <p class="password-hint">可选，用于限制编辑、打印等权限</p>
+                </div>
+            </div>
+
+            <button id="encryptBtn" class="btn btn-primary hidden">🔐 加密 PDF</button>
+            <div id="encryptProgress" class="progress hidden">
+                <div class="progress-bar" id="encryptProgressBar"></div>
+                <p id="encryptStatusText">加密中...</p>
+            </div>
+            <div id="encryptError" class="error hidden"></div>
+            <div id="encryptResult" class="result hidden">
+                <p>✅ 加密完成！</p>
+                <a id="encryptDownloadLink" class="btn btn-success" download>📥 下载加密 PDF</a>
+            </div>
+        </div>
+
+        <!-- 解密模式 -->
+        <div class="mode-content" id="decryptMode">
+            <div class="upload-zone" id="decryptDropZone">
+                <div class="upload-icon">📂</div>
+                <p class="upload-text">拖放加密的 PDF 文件到此处</p>
+                <p class="upload-hint">或点击选择文件</p>
+                <input type="file" id="decryptFileInput" accept=".pdf" hidden>
+            </div>
+
+            <div id="decryptFileInfo" class="file-info hidden">
+                <span id="decryptFileName"></span>
+                <span id="decryptFileSize"></span>
+                <button id="decryptRemoveBtn" class="btn-remove">✕</button>
+            </div>
+
+            <div id="decryptParams" class="hidden" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:16px;">
+                <div class="password-group">
+                    <label>🔑 PDF 密码</label>
+                    <input type="password" id="decryptPassword" placeholder="输入打开 PDF 的密码">
+                </div>
+            </div>
+
+            <button id="decryptBtn" class="btn btn-primary hidden">🔓 解密 PDF</button>
+            <div id="decryptProgress" class="progress hidden">
+                <div class="progress-bar" id="decryptProgressBar"></div>
+                <p id="decryptStatusText">解密中...</p>
+            </div>
+            <div id="decryptError" class="error hidden"></div>
+            <div id="decryptResult" class="result hidden">
+                <p>✅ 解密完成！</p>
+                <a id="decryptDownloadLink" class="btn btn-success" download>📥 下载解密 PDF</a>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li><strong>加密：</strong>为 PDF 设置密码保护，打开文件时需要输入密码</li>
+                <li><strong>解密：</strong>移除已加密 PDF 的密码保护，需要知道原密码</li>
+                <li>使用 <strong>128 位 AES 加密</strong>，兼容主流 PDF 阅读器</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "加密后忘记密码怎么办?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "很遗憾,AES 256 加密强度下忘记密码无法恢复。请妥善保管密码或备份未加密的原始文件。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "用户密码和所有者密码的区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "用户密码:打开 PDF 时需要输入;所有者密码:仅限制编辑/打印/复制等操作,可正常打开查看。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "解密需要原密码吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "是的,解密必须知道原密码(所有者密码)才能移除限制,这是出于安全考虑。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "加密算法是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "采用 AES-256 强加密,符合 PDF 2.0 标准,兼容所有现代 PDF 阅读器。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-watermark" class="related-tool-card">
+            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-name">PDF 加水印</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/hash-check" class="related-tool-card">
+            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-name">文件哈希校验</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        // Mode switching
+        document.querySelectorAll('.mode-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.mode-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.mode + 'Mode').classList.add('active');
+            });
+        });
+
+        const MAX_SIZE = 200 * 1024 * 1024;
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        // Encrypt mode
+        const encryptDropZone = document.getElementById('encryptDropZone');
+        const encryptFileInput = document.getElementById('encryptFileInput');
+        const encryptFileInfo = document.getElementById('encryptFileInfo');
+        const encryptFileName = document.getElementById('encryptFileName');
+        const encryptFileSize = document.getElementById('encryptFileSize');
+        const encryptRemoveBtn = document.getElementById('encryptRemoveBtn');
+        const encryptParams = document.getElementById('encryptParams');
+        const encryptPassword = document.getElementById('encryptPassword');
+        const encryptBtn = document.getElementById('encryptBtn');
+        
+        let encryptFile = null;
+        encryptDropZone.addEventListener('click', () => encryptFileInput.click());
+        encryptFileInput.addEventListener('change', () => {
+            if (encryptFileInput.files[0]) {
+                encryptFile = encryptFileInput.files[0];
+                encryptFileName.textContent = encryptFile.name;
+                encryptFileSize.textContent = formatSize(encryptFile.size);
+                show(encryptFileInfo);
+                show(encryptParams);
+                encryptDropZone.classList.add('has-file');
+                show(encryptBtn);
+            }
+        });
+        encryptRemoveBtn.addEventListener('click', () => { encryptFile = null; hide(encryptFileInfo); hide(encryptParams); hide(encryptBtn); encryptDropZone.classList.remove('has-file'); });
+        encryptBtn.addEventListener('click', async () => {
+            const pwd = encryptPassword.value.trim();
+            if (!pwd) { document.getElementById('encryptError').textContent = '请输入密码'; show(document.getElementById('encryptError')); return; }
+            show(document.getElementById('encryptProgress'));
+            const formData = new FormData();
+            formData.append('file', encryptFile);
+            formData.append('password', pwd);
+            const resp = await fetch('/api/convert/pdf-encrypt', { method: 'POST', body: formData });
+            if (!resp.ok) { alert('加密失败'); return; }
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            document.getElementById('encryptDownloadLink').href = url;
+            document.getElementById('encryptDownloadLink').download = 'encrypted.pdf';
+            hide(document.getElementById('encryptProgress'));
+            show(document.getElementById('encryptResult'));
+        });
+
+        // Decrypt mode
+        const decryptDropZone = document.getElementById('decryptDropZone');
+        const decryptFileInput = document.getElementById('decryptFileInput');
+        const decryptFileInfo = document.getElementById('decryptFileInfo');
+        const decryptFileName = document.getElementById('decryptFileName');
+        const decryptFileSize = document.getElementById('decryptFileSize');
+        const decryptRemoveBtn = document.getElementById('decryptRemoveBtn');
+        const decryptParams = document.getElementById('decryptParams');
+        const decryptPassword = document.getElementById('decryptPassword');
+        const decryptBtn = document.getElementById('decryptBtn');
+        
+        let decryptFile = null;
+        decryptDropZone.addEventListener('click', () => decryptFileInput.click());
+        decryptFileInput.addEventListener('change', () => {
+            if (decryptFileInput.files[0]) {
+                decryptFile = decryptFileInput.files[0];
+                decryptFileName.textContent = decryptFile.name;
+                decryptFileSize.textContent = formatSize(decryptFile.size);
+                show(decryptFileInfo);
+                show(decryptParams);
+                decryptDropZone.classList.add('has-file');
+                show(decryptBtn);
+            }
+        });
+        decryptRemoveBtn.addEventListener('click', () => { decryptFile = null; hide(decryptFileInfo); hide(decryptParams); hide(decryptBtn); decryptDropZone.classList.remove('has-file'); });
+        decryptBtn.addEventListener('click', async () => {
+            const pwd = decryptPassword.value.trim();
+            if (!pwd) { document.getElementById('decryptError').textContent = '请输入密码'; show(document.getElementById('decryptError')); return; }
+            show(document.getElementById('decryptProgress'));
+            const formData = new FormData();
+            formData.append('file', decryptFile);
+            formData.append('password', pwd);
+            const resp = await fetch('/api/convert/pdf-decrypt', { method: 'POST', body: formData });
+            if (!resp.ok) { alert('解密失败'); return; }
+            const blob = await resp.blob();
+            const url = URL.createObjectURL(blob);
+            document.getElementById('decryptDownloadLink').href = url;
+            document.getElementById('decryptDownloadLink').download = 'decrypted.pdf';
+            hide(document.getElementById('decryptProgress'));
+            show(document.getElementById('decryptResult'));
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

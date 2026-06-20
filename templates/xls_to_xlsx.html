@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XLS → XLSX 转换 - 办公效率工具集</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.xls_to_xlsx.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.xls_to_xlsx.title,
+        description=seo_meta.xls_to_xlsx.description,
+        keywords=seo_meta.xls_to_xlsx.keywords,
+        path=seo_meta.xls_to_xlsx.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.xls_to_xlsx.title.split(' - ')[0], 'url': seo_meta.xls_to_xlsx.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
 </head>
 <body>
 <div class="container">
@@ -40,14 +56,82 @@
         <a id="downloadLink" class="btn btn-success" download>下载 XLSX</a>
     </div>
 
-    <div class="note">
-        <h3>📋 说明</h3>
+    <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+        <h3>使用说明</h3>
         <ul>
             <li>支持最大 500MB 的文件</li>
             <li>文件仅用于转换，不会被永久存储（30分钟后自动清理）</li>
             <li>建议先用小文件测试，确认效果满意后再处理大文件</li>
         </ul>
     </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "XLS 和 XLSX 有什么区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "XLS 是 Excel 97-2003 的旧版二进制格式,最大支持 65536 行;XLSX 是 Excel 2007+ 启用的现代 XML 格式,支持 1048576 行,文件更小且支持更多新功能。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "XLS 转 XLSX 会丢失格式吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不会。本工具基于 LibreOffice 引擎,完整保留单元格格式、字体、颜色、图片、图表、公式等所有元素。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的文件?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单文件最大 500MB,转换基于 LibreOffice 本地引擎,处理速度快。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "我的文件安全吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "文件仅用于本次转换,不会永久存储。所有临时文件 30 分钟后自动清理。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/csv-excel" class="related-tool-card">
+            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-name">CSV ↔ Excel</span>
+        </a>
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/image-compress" class="related-tool-card">
+            <span class="related-tool-icon">🖼️</span>
+            <span class="related-tool-name">图片压缩</span>
+        </a>
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
 </div>
 
 <script>
@@ -196,5 +280,7 @@
     });
 })();
 </script>
+    
+    {% include '_footer.html' %}
 </body>
 </html>

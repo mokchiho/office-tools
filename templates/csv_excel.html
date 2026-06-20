@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.csv_excel.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.csv_excel.title,
+        description=seo_meta.csv_excel.description,
+        keywords=seo_meta.csv_excel.keywords,
+        path=seo_meta.csv_excel.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.csv_excel.title.split(' - ')[0], 'url': seo_meta.csv_excel.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon excel">🔄</div>
+            CSV ↔ Excel 转换
+        </h1>
+        <p class="page-desc"><strong>CSV → Excel：</strong>解决 Excel 打开 CSV 乱码问题，自动检测编码。<br>
+        <strong>Excel → CSV：</strong>将 Excel 工作表导出为 CSV，支持 UTF-8 编码。</p>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="csv2excel">📥 CSV → Excel</button>
+            <button class="mode-tab" data-mode="excel2csv">📤 Excel → CSV</button>
+        </div>
+
+        <!-- CSV → Excel 模式 -->
+        <div class="mode-content active" id="csv2excelMode">
+            <div class="upload-zone" id="csvDropZone">
+                <div class="upload-icon">📂</div>
+                <p class="upload-text">拖放 CSV 文件到此处</p>
+                <p class="upload-hint">或点击选择文件</p>
+                <input type="file" id="csvFileInput" accept=".csv" hidden>
+            </div>
+
+            <div id="csvFileInfo" class="file-info hidden">
+                <span id="csvFileName"></span>
+                <span id="csvFileSize"></span>
+                <button id="csvRemoveBtn" class="btn-remove">✕</button>
+            </div>
+
+            <button id="csvConvertBtn" class="btn btn-primary hidden">🚀 转换为 Excel</button>
+            <div id="csvProgress" class="progress hidden">
+                <div class="progress-bar" id="csvProgressBar"></div>
+                <p id="csvStatusText">转换中...</p>
+            </div>
+            <div id="csvError" class="error hidden"></div>
+            <div id="csvResult" class="result hidden">
+                <p>✅ 转换完成！</p>
+                <a id="csvDownloadLink" class="btn btn-success" download>📥 下载 Excel</a>
+            </div>
+        </div>
+
+        <!-- Excel → CSV 模式 -->
+        <div class="mode-content" id="excel2csvMode">
+            <div class="upload-zone" id="excelDropZone">
+                <div class="upload-icon">📂</div>
+                <p class="upload-text">拖放 Excel 文件到此处</p>
+                <p class="upload-hint">或点击选择文件（.xlsx / .xls）</p>
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls" hidden>
+            </div>
+
+            <div id="excelFileInfo" class="file-info hidden">
+                <span id="excelFileName"></span>
+                <span id="excelFileSize"></span>
+                <button id="excelRemoveBtn" class="btn-remove">✕</button>
+            </div>
+
+            <button id="excelConvertBtn" class="btn btn-primary hidden">🚀 转换为 CSV</button>
+            <div id="excelProgress" class="progress hidden">
+                <div class="progress-bar" id="excelProgressBar"></div>
+                <p id="excelStatusText">转换中...</p>
+            </div>
+            <div id="excelError" class="error hidden"></div>
+            <div id="excelResult" class="result hidden">
+                <p>✅ 转换完成！</p>
+                <a id="excelDownloadLink" class="btn btn-success" download>📥 下载 CSV</a>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>CSV → Excel：自动检测编码，解决中文乱码</li>
+                <li>Excel → CSV：默认输出 UTF-8 编码</li>
+                <li>文件处理完成后自动删除，不会在服务器上保留</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "中文乱码怎么解决?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "本工具自动检测文件编码(UTF-8/GBK/GB2312 等),可彻底解决 Excel 打开 CSV 时的中文乱码问题。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持自定义分隔符吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。可选择逗号、分号、Tab、空格等常用分隔符,适配各种数据源。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Excel 转 CSV 时会丢失格式吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "CSV 本身是纯文本格式,只保留数据内容(不保留颜色、公式等格式)。如需保留请用 XLSX 输出。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持大型 CSV 文件吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单文件最大 50MB,处理基于 Pandas 库,百万行级数据处理流畅。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/xls-to-xlsx" class="related-tool-card">
+            <span class="related-tool-icon">📊</span>
+            <span class="related-tool-name">XLS 转 XLSX</span>
+        </a>
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        const modeContents = document.querySelectorAll('.mode-content');
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                modeTabs.forEach(t => t.classList.remove('active'));
+                modeContents.forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.mode + 'Mode').classList.add('active');
+            });
+        });
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        // CSV → Excel
+        const csvDropZone = document.getElementById('csvDropZone');
+        const csvFileInput = document.getElementById('csvFileInput');
+        const csvFileInfo = document.getElementById('csvFileInfo');
+        const csvFileName = document.getElementById('csvFileName');
+        const csvFileSize = document.getElementById('csvFileSize');
+        const csvConvertBtn = document.getElementById('csvConvertBtn');
+        let csvFile = null;
+
+        csvDropZone.addEventListener('click', () => csvFileInput.click());
+        csvFileInput.addEventListener('change', () => {
+            if (csvFileInput.files[0]) {
+                csvFile = csvFileInput.files[0];
+                csvFileName.textContent = csvFile.name;
+                csvFileSize.textContent = formatSize(csvFile.size);
+                show(csvFileInfo);
+                csvDropZone.classList.add('has-file');
+                show(csvConvertBtn);
+            }
+        });
+        document.getElementById('csvRemoveBtn').addEventListener('click', () => { csvFile = null; hide(csvFileInfo); hide(csvConvertBtn); csvDropZone.classList.remove('has-file'); });
+        
+        csvConvertBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('file', csvFile);
+            formData.append('encoding', 'auto');
+            show(document.getElementById('csvProgress'));
+            try {
+                const resp = await fetch('/api/convert/csv-to-excel', { method: 'POST', body: formData });
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                document.getElementById('csvDownloadLink').href = url;
+                document.getElementById('csvDownloadLink').download = 'converted.xlsx';
+                hide(document.getElementById('csvProgress'));
+                show(document.getElementById('csvResult'));
+            } catch (e) { alert(e.message); }
+        });
+
+        // Excel → CSV
+        const excelDropZone = document.getElementById('excelDropZone');
+        const excelFileInput = document.getElementById('excelFileInput');
+        const excelFileInfo = document.getElementById('excelFileInfo');
+        const excelFileName = document.getElementById('excelFileName');
+        const excelFileSize = document.getElementById('excelFileSize');
+        const excelConvertBtn = document.getElementById('excelConvertBtn');
+        let excelFile = null;
+
+        excelDropZone.addEventListener('click', () => excelFileInput.click());
+        excelFileInput.addEventListener('change', () => {
+            if (excelFileInput.files[0]) {
+                excelFile = excelFileInput.files[0];
+                excelFileName.textContent = excelFile.name;
+                excelFileSize.textContent = formatSize(excelFile.size);
+                show(excelFileInfo);
+                excelDropZone.classList.add('has-file');
+                show(excelConvertBtn);
+            }
+        });
+        document.getElementById('excelRemoveBtn').addEventListener('click', () => { excelFile = null; hide(excelFileInfo); hide(excelConvertBtn); excelDropZone.classList.remove('has-file'); });
+        
+        excelConvertBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('file', excelFile);
+            formData.append('encoding', 'utf-8');
+            show(document.getElementById('excelProgress'));
+            try {
+                const resp = await fetch('/api/convert/excel-to-csv', { method: 'POST', body: formData });
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                document.getElementById('excelDownloadLink').href = url;
+                document.getElementById('excelDownloadLink').download = 'converted.csv';
+                hide(document.getElementById('excelProgress'));
+                show(document.getElementById('excelResult'));
+            } catch (e) { alert(e.message); }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

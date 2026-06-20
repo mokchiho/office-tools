@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.base64.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.base64.title,
+        description=seo_meta.base64.description,
+        keywords=seo_meta.base64.keywords,
+        path=seo_meta.base64.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.base64.title.split(' - ')[0], 'url': seo_meta.base64.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon code">🔤</div>
+            Base64 编解码
+        </h1>
+        <p class="page-desc">文本与 Base64 互转，<strong>支持中文（UTF-8）</strong>。<br>
+        全部在浏览器本地处理，<strong>不经过服务器</strong>，保护您的数据安全。</p>
+
+        <div class="tool-section">
+            <div class="tool-tabs">
+                <button class="tool-tab active" data-tab="encode">🔐 编码</button>
+                <button class="tool-tab" data-tab="decode">🔓 解码</button>
+            </div>
+
+            <div id="tab-encode" class="tab-content active">
+                <div class="input-group">
+                    <label class="input-label">输入文本</label>
+                    <textarea id="encodeInput" class="tool-textarea" rows="4" placeholder="输入要编码的文本..."></textarea>
+                    <div class="btn-row">
+                        <button id="encodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 编码 → Base64</button>
+                        <button id="encodeClear" class="btn-sm">🗑 清空</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Base64 结果</label>
+                    <textarea id="encodeOutput" class="tool-textarea" rows="4" readonly placeholder="Base64 编码结果..." onclick="this.select()" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <div class="btn-row">
+                        <button id="encodeCopy" class="btn-sm">📋 复制结果</button>
+                        <span id="encodeStats" style="font-size:13px;color:#64748b;line-height:40px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-decode" class="tab-content">
+                <div class="input-group">
+                    <label class="input-label">输入 Base64</label>
+                    <textarea id="decodeInput" class="tool-textarea" rows="4" placeholder="输入 Base64 字符串..."></textarea>
+                    <div class="btn-row">
+                        <button id="decodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 解码 → 文本</button>
+                        <button id="decodeClear" class="btn-sm">🗑 清空</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">解码结果</label>
+                    <textarea id="decodeOutput" class="tool-textarea" rows="4" readonly placeholder="解码后的文本..." onclick="this.select()" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <div class="btn-row">
+                        <button id="decodeCopy" class="btn-sm">📋 复制结果</button>
+                        <span id="decodeError" class="tool-error-msg" style="font-size:13px;line-height:40px;color:#ef4444;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>中文（UTF-8）先编码为字节再转 Base64，兼容国际标准</li>
+                <li>解码时自动识别 UTF-8 编码的中文文本</li>
+                <li>所有计算在浏览器本地完成，<strong>数据不上传服务器</strong></li>
+                <li>实时转换：输入后自动处理，无需点击按钮</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Base64 是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Base64 是一种基于 64 个可打印字符来表示二进制数据的编码方式,常用于在 URL、Cookie、JSON 中传递二进制数据。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持中文编码吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。本工具使用 UTF-8 编码处理中文,可正确编码/解码包含中文、表情符号等任意 Unicode 字符。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "数据会上传服务器吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不会。所有处理完全在浏览器本地完成,数据不会离开您的设备。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "有长度限制吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "无硬性限制,但建议单次输入不超过 10MB 文本以保证浏览器性能。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+        <a href="/hash-check" class="related-tool-card">
+            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-name">文件哈希校验</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+        <a href="/qrcode" class="related-tool-card">
+            <span class="related-tool-icon">📱</span>
+            <span class="related-tool-name">二维码生成</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        // UTF-8 安全的 Base64 编码
+        function utf8ToBase64(str) {
+            const bytes = new TextEncoder().encode(str);
+            let binary = '';
+            for (let i = 0; i < bytes.length; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        function base64ToUtf8(b64) {
+            try {
+                const binary = atob(b64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                return new TextDecoder().decode(bytes);
+            } catch (e) {
+                throw new Error('Base64 字符串无效');
+            }
+        }
+
+        // Tab 切换
+        document.querySelectorAll('.tool-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 编码
+        const encodeInput = document.getElementById('encodeInput');
+        const encodeOutput = document.getElementById('encodeOutput');
+        const encodeStats = document.getElementById('encodeStats');
+
+        function doEncode() {
+            const text = encodeInput.value;
+            if (!text) { encodeOutput.value = ''; encodeStats.textContent = ''; return; }
+            try {
+                const b64 = utf8ToBase64(text);
+                encodeOutput.value = b64;
+                const origBytes = new TextEncoder().encode(text).length;
+                const b64Len = b64.length;
+                const ratio = ((b64Len / origBytes) * 100).toFixed(1);
+                encodeStats.textContent = `原文 ${origBytes}B → Base64 ${b64Len}B (${ratio}%)`;
+            } catch (e) {
+                encodeOutput.value = '编码失败: ' + e.message;
+            }
+        }
+
+        encodeInput.addEventListener('input', () => {
+            clearTimeout(encodeTimer);
+            encodeTimer = setTimeout(doEncode, 300);
+        });
+        let encodeTimer;
+        document.getElementById('encodeBtn').addEventListener('click', doEncode);
+        
+        document.getElementById('encodeClear').addEventListener('click', () => {
+            encodeInput.value = '';
+            encodeOutput.value = '';
+            encodeStats.textContent = '';
+            encodeInput.focus();
+        });
+
+        document.getElementById('encodeCopy').addEventListener('click', () => {
+            if (!encodeOutput.value) return;
+            navigator.clipboard.writeText(encodeOutput.value).then(() => {
+                const btn = document.getElementById('encodeCopy');
+                btn.textContent = '✅ 已复制';
+                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+            });
+        });
+
+        // 解码
+        const decodeInput = document.getElementById('decodeInput');
+        const decodeOutput = document.getElementById('decodeOutput');
+        const decodeError = document.getElementById('decodeError');
+
+        function doDecode() {
+            const b64 = decodeInput.value.trim();
+            if (!b64) { decodeOutput.value = ''; decodeError.textContent = ''; return; }
+            try {
+                const text = base64ToUtf8(b64);
+                decodeOutput.value = text;
+                decodeError.textContent = '';
+            } catch (e) {
+                decodeOutput.value = '';
+                decodeError.textContent = '⚠️ ' + e.message;
+            }
+        }
+
+        decodeInput.addEventListener('input', () => {
+            clearTimeout(decodeTimer);
+            decodeTimer = setTimeout(doDecode, 300);
+        });
+        let decodeTimer;
+        document.getElementById('decodeBtn').addEventListener('click', doDecode);
+        
+        document.getElementById('decodeClear').addEventListener('click', () => {
+            decodeInput.value = '';
+            decodeOutput.value = '';
+            decodeError.textContent = '';
+            decodeInput.focus();
+        });
+
+        document.getElementById('decodeCopy').addEventListener('click', () => {
+            if (!decodeOutput.value) return;
+            navigator.clipboard.writeText(decodeOutput.value).then(() => {
+                const btn = document.getElementById('decodeCopy');
+                btn.textContent = '✅ 已复制';
+                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+            });
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

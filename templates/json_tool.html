@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.json_tool.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.json_tool.title,
+        description=seo_meta.json_tool.description,
+        keywords=seo_meta.json_tool.keywords,
+        path=seo_meta.json_tool.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.json_tool.title.split(' - ')[0], 'url': seo_meta.json_tool.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon code">{ }</div>
+            JSON 格式化工具
+        </h1>
+        <p class="page-desc">JSON 美化（格式化）、压缩（去空格）、语法校验。<br>
+        全部在浏览器本地处理，<strong>不经过服务器</strong>，保护您的数据安全。</p>
+
+        <div class="tool-section">
+            <div class="tool-tabs">
+                <button class="tool-tab active" data-tab="editor">编辑器</button>
+                <button class="tool-tab" data-tab="sample">示例数据</button>
+            </div>
+
+            <div id="tab-editor" class="tab-content active">
+                <div class="input-group">
+                    <label class="input-label">输入 JSON</label>
+                    <textarea id="jsonInput" class="tool-textarea" rows="10" placeholder="粘贴 JSON 字符串..." spellcheck="false"></textarea>
+                    <div class="tool-statbar">
+                        <span id="jsonStats" style="font-size:13px;color:#64748b;"></span>
+                        <span id="jsonError" class="tool-error-msg" style="font-size:13px;"></span>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button id="formatBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;background: linear-gradient(135deg, #3b82f6, #2563eb);">✨ 美化 (2格)</button>
+                    <button id="format4Btn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 美化 (4格)</button>
+                    <button id="compactBtn" class="btn-sm">📦 压缩</button>
+                    <button id="validateBtn" class="btn-sm">✓ 校验</button>
+                    <button id="jsonClearBtn" class="btn-sm">🗑 清空</button>
+                </div>
+
+                <div class="input-group" style="margin-top: 20px;">
+                    <label class="input-label">输出结果</label>
+                    <textarea id="jsonOutput" class="tool-textarea tool-output" rows="10" readonly placeholder="结果将显示在这里..." onclick="this.select()" spellcheck="false" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <div class="btn-row" style="margin-top:8px;">
+                        <button id="jsonCopyBtn" class="btn-sm">📋 复制结果</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-sample" class="tab-content">
+                <div class="input-group">
+                    <p style="font-size:14px;color:#64748b;margin-bottom:12px;">点击下方示例，自动填入编辑器测试：</p>
+                    <div id="sampleList" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="btn-sm sample-btn">用户信息</button>
+                        <button class="btn-sm sample-btn">配置项</button>
+                        <button class="btn-sm sample-btn">嵌套数据</button>
+                        <button class="btn-sm sample-btn" style="background: #fef3c7; color: #b45309;">错误示例</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li><strong>美化：</strong>将压缩的 JSON 格式化为缩进易读的格式</li>
+                <li><strong>压缩：</strong>去除所有空格和换行，减小体积</li>
+                <li><strong>校验：</strong>验证 JSON 语法，提示错误位置</li>
+                <li>所有计算在浏览器本地完成，<strong>数据不上传服务器</strong></li>
+                <li>快捷键：<code>Ctrl + Enter</code> 快速格式化</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "JSON 格式化有什么用途?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "将压缩的 JSON 字符串(单行)美化为带缩进的多行格式,便于阅读和调试;压缩则相反,可减小传输体积。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "能定位错误位置吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以。当 JSON 不合法时,工具会高亮显示错误所在的行列号,并提示错误原因。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持 JSON5 或注释吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不支持。严格的 JSON5/带注释 JSON 需要先转换为标准 JSON 才能被服务器解析。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "我的数据安全吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "完全本地处理,不会上传到服务器。可放心处理敏感数据。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+        <a href="/hash-check" class="related-tool-card">
+            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-name">文件哈希校验</span>
+        </a>
+        <a href="/csv-excel" class="related-tool-card">
+            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-name">CSV ↔ Excel</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const jsonInput = document.getElementById('jsonInput');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const jsonStats = document.getElementById('jsonStats');
+        const jsonError = document.getElementById('jsonError');
+
+        // Tab 切换
+        document.querySelectorAll('.tool-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 核心：解析并美化/压缩
+        function processJson(indent) {
+            const raw = jsonInput.value.trim();
+            if (!raw) {
+                jsonOutput.value = '';
+                jsonStats.textContent = '';
+                jsonError.textContent = '';
+                return;
+            }
+            try {
+                const parsed = JSON.parse(raw);
+                const pretty = JSON.stringify(parsed, null, indent);
+                jsonOutput.value = pretty;
+                jsonStats.textContent = `${pretty.length} 字符, ${pretty.split('\n').length} 行`;
+                jsonError.textContent = '';
+            } catch (e) {
+                const match = e.message.match(/position\s+(\d+)/i);
+                if (match) {
+                    const pos = parseInt(match[1]);
+                    const before = raw.substring(0, pos);
+                    const lineNum = (before.match(/\n/g) || []).length + 1;
+                    jsonError.textContent = `⚠️ 第 ${lineNum} 行出错: ${e.message}`;
+                } else {
+                    jsonError.textContent = '���️ ' + e.message;
+                }
+                jsonStats.textContent = '';
+            }
+        }
+
+        function validateOnly() {
+            const raw = jsonInput.value.trim();
+            if (!raw) return;
+            try {
+                JSON.parse(raw);
+                jsonOutput.value = '✅ JSON 语法正确';
+                jsonStats.textContent = '';
+                jsonError.textContent = '';
+            } catch (e) {
+                processJson(2);
+            }
+        }
+
+        // 按钮事件
+        document.getElementById('formatBtn').addEventListener('click', () => processJson(2));
+        document.getElementById('format4Btn').addEventListener('click', () => processJson(4));
+        document.getElementById('compactBtn').addEventListener('click', () => processJson(null));
+        document.getElementById('validateBtn').addEventListener('click', validateOnly);
+        
+        document.getElementById('jsonClearBtn').addEventListener('click', () => {
+            jsonInput.value = '';
+            jsonOutput.value = '';
+            jsonStats.textContent = '';
+            jsonError.textContent = '';
+            jsonInput.focus();
+        });
+
+        document.getElementById('jsonCopyBtn').addEventListener('click', () => {
+            if (!jsonOutput.value) return;
+            navigator.clipboard.writeText(jsonOutput.value).then(() => {
+                const btn = document.getElementById('jsonCopyBtn');
+                btn.textContent = '✅ 已复制';
+                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+            });
+        });
+
+        // 快捷键
+        jsonInput.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                processJson(2);
+            }
+        });
+
+        // 示例数据
+        const SAMPLES = {
+            '用户信息': JSON.stringify({name:'张三',age:28,email:'zhangsan@example.com',address:{city:'北京',district:'海淀'},hobbies:['读书','编程']}, null, 2),
+            '配置项': JSON.stringify({server:{port:8080,ssl:true},database:{type:'mysql'}}, null, 2),
+            '嵌套数据': JSON.stringify({id:'usr_001',profile:{settings:{theme:'dark'}}}, null, 2),
+            '错误示例': '{"name": "测试", "age": 25,}',
+        };
+
+        document.querySelectorAll('.sample-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const key = btn.textContent.trim();
+                document.querySelectorAll('.tool-tab')[0].click();
+                jsonInput.value = key === '错误示例' ? SAMPLES[key] : SAMPLES[key];
+                processJson(2);
+            });
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

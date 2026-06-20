@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.image_convert.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.image_convert.title,
+        description=seo_meta.image_convert.description,
+        keywords=seo_meta.image_convert.keywords,
+        path=seo_meta.image_convert.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.image_convert.title.split(' - ')[0], 'url': seo_meta.image_convert.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon image">🔄</div>
+            图片格式转换
+        </h1>
+        <p class="page-desc">在 JPG / PNG / WebP / BMP / GIF / TIFF 格式之间自由转换。<br>
+        <strong>支持透明通道处理，</strong>转换至不支持透明的格式时自动填充背景色。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放图片文件到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,.tiff" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <div id="params" class="param-group hidden">
+            <div class="param-row">
+                <span class="param-label">目标格式</span>
+                <select id="targetFormat">
+                    <option value="jpeg">JPEG (.jpg)</option>
+                    <option value="png" selected>PNG (.png)</option>
+                    <option value="webp">WebP (.webp)</option>
+                    <option value="bmp">BMP (.bmp)</option>
+                    <option value="gif">GIF (.gif)</option>
+                    <option value="tiff">TIFF (.tiff)</option>
+                </select>
+            </div>
+            <div class="param-row" id="qualityRow">
+                <span class="param-label">输出质量</span>
+                <input type="range" id="qualitySlider" min="1" max="100" value="90">
+                <span class="param-value" id="qualityValue">90</span>
+            </div>
+            <p class="param-hint">仅 JPEG / WebP 格式有效</p>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始转换
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">转换中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 转换完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载转换后的文件</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>支持输入：JPG / JPEG / PNG / WebP / BMP / GIF / TIFF</li>
+                <li>透明 PNG 转 JPEG/BMP/GIF 时自动以白色背景填充</li>
+                <li>文件仅用于转换，不会被永久存储（30分钟后自动清理）</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "支持哪些图片格式互转?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持 JPG/PNG/WebP/BMP/GIF/TIFF 六种格式互转。所有转换均在本地完成,不上传服务器。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "转换后图片质量会变化吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "JPG/WebP 转换时可设置质量参数(0-100%),默认 90% 几乎无损;PNG/BMP/TIFF 为无损格式,转换不损失质量。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "GIF 动图转换后会动吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "仅保留第一帧。如需保留动画请使用其他动图工具。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的图片?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单张图片最大 50MB,转换基于 Pillow 本地库处理。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/image-compress" class="related-tool-card">
+            <span class="related-tool-icon">🖼️</span>
+            <span class="related-tool-name">图片压缩</span>
+        </a>
+        <a href="/images-to-pdf" class="related-tool-card">
+            <span class="related-tool-icon">📑</span>
+            <span class="related-tool-name">图片转 PDF</span>
+        </a>
+        <a href="/pdf-to-word" class="related-tool-card">
+            <span class="related-tool-icon">📄</span>
+            <span class="related-tool-name">PDF 转 Word</span>
+        </a>
+        <a href="/qrcode" class="related-tool-card">
+            <span class="related-tool-icon">📱</span>
+            <span class="related-tool-name">二维码生成</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const params = document.getElementById('params');
+        const targetFormat = document.getElementById('targetFormat');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const qualityRow = document.getElementById('qualityRow');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let isConverting = false;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        const IMG_EXTS = ['.jpg','.jpeg','.png','.webp','.bmp','.gif','.tiff'];
+
+        function handleFile(file) {
+            if (!file) return;
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!IMG_EXTS.includes(ext)) { showError('仅支持 JPG/PNG/WebP/BMP/GIF/TIFF 格式'); return; }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            show(fileInfo);
+            show(params);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+            updateOptions();
+        }
+
+        function showError(msg) { errorDiv.textContent = msg; show(errorDiv); hide(resultDiv); }
+
+        function updateOptions() {
+            const fmt = targetFormat.value;
+            const showQuality = fmt === 'jpeg' || fmt === 'webp';
+            qualityRow.style.display = showQuality ? 'flex' : 'none';
+            qualityRow.nextElementSibling.style.display = showQuality ? 'block' : 'none';
+        }
+
+        targetFormat.addEventListener('change', updateOptions);
+        qualitySlider.addEventListener('input', () => qualityValue.textContent = qualitySlider.value);
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; handleFile(e.dataTransfer.files[0]); } });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+        removeBtn.addEventListener('click', () => { selectedFile = null; fileInput.value = ''; hide(fileInfo); hide(params); hide(convertBtn); dropZone.classList.remove('has-file'); });
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || isConverting) return;
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 转换中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('target_format', targetFormat.value);
+            formData.append('quality', qualitySlider.value);
+            formData.append('bg_color', '#ffffff');
+
+            try {
+                const resp = await fetch('/api/convert/image-format', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                if (!resp.ok) throw new Error('转换失败');
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+                const nameParts = selectedFile.name.split('.');
+                nameParts.pop();
+                downloadLink.href = url;
+                downloadLink.download = nameParts.join('.') + '.' + targetFormat.value.replace('jpg','jpeg');
+                hide(progress);
+                show(resultDiv);
+            } catch (err) { showError(err.message); } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始转换';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

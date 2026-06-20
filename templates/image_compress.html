@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.image_compress.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.image_compress.title,
+        description=seo_meta.image_compress.description,
+        keywords=seo_meta.image_compress.keywords,
+        path=seo_meta.image_compress.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.image_compress.title.split(' - ')[0], 'url': seo_meta.image_compress.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon image">🖼️</div>
+            图片压缩
+        </h1>
+        <p class="page-desc">压缩 JPG / PNG / WebP 等图片文件大小，支持自定义压缩质量和尺寸限制。<br>
+        <strong>全部在服务器端即时处理，</strong>不保留任何文件。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放图片文件到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp,.gif,.tiff" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <div id="params" class="param-group hidden">
+            <div class="param-row">
+                <span class="param-label">压缩质量</span>
+                <input type="range" id="qualitySlider" min="1" max="100" value="80" style="flex:1;">
+                <span class="param-value" id="qualityValue">80</span>
+            </div>
+            <p class="param-hint">值越小文件越小，画质损失越大（JPEG/WebP 有效）</p>
+            <div class="param-row">
+                <span class="param-label">最大宽度</span>
+                <input type="number" id="maxWidth" placeholder="不限" min="1">
+                <span style="font-size:13px;color:#94a3b8;">px</span>
+            </div>
+            <div class="param-row">
+                <span class="param-label">最大高度</span>
+                <input type="number" id="maxHeight" placeholder="不限" min="1">
+                <span style="font-size:13px;color:#94a3b8;">px</span>
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始压缩
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">压缩中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 压缩完成！</p>
+            <p id="sizeCompare" style="font-size:14px;color:#166534;margin-bottom:12px;"></p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载压缩后的文件</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>支持格式：JPG / JPEG / PNG / WebP / BMP / GIF / TIFF</li>
+                <li>透明 PNG 转 JPEG 时自动以白色背景填充</li>
+                <li>文件仅用于转换，不会被永久存储（30分钟后自动清理）</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "图片压缩会降低画质吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "会有轻微降低。本工具提供 0-100% 质量滑块,建议设置 70-85% 即可在保持视觉质量的同时大幅减小体积。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持哪些图片格式?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持 JPG/JPEG、PNG、WebP 三种主流格式。推荐 JPG 用于照片,PNG 用于透明背景,WebP 用于现代应用。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的图片?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单张图片最大 50MB。建议先用图片格式转换工具调整尺寸再压缩,以获得最佳效果。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "可以批量压缩多张图片吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。可以一次选择多张图片,工具会逐张压缩并分别提供下载。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/image-convert" class="related-tool-card">
+            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-name">图片格式转换</span>
+        </a>
+        <a href="/images-to-pdf" class="related-tool-card">
+            <span class="related-tool-icon">📑</span>
+            <span class="related-tool-name">图片转 PDF</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const params = document.getElementById('params');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const maxWidth = document.getElementById('maxWidth');
+        const maxHeight = document.getElementById('maxHeight');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const sizeCompare = document.getElementById('sizeCompare');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let isConverting = false;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        const IMG_EXTS = ['.jpg','.jpeg','.png','.webp','.bmp','.gif','.tiff'];
+
+        function handleFile(file) {
+            if (!file) return;
+            const ext = '.' + file.name.split('.').pop().toLowerCase();
+            if (!IMG_EXTS.includes(ext)) { showError('仅支持 JPG/PNG/WebP/BMP/GIF/TIFF 格式'); return; }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            show(fileInfo);
+            show(params);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+        }
+
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            show(errorDiv);
+        }
+
+        qualitySlider.addEventListener('input', () => qualityValue.textContent = qualitySlider.value);
+
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files.length) { fileInput.files = e.dataTransfer.files; handleFile(e.dataTransfer.files[0]); } });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+        removeBtn.addEventListener('click', () => { selectedFile = null; fileInput.value = ''; hide(fileInfo); hide(params); hide(convertBtn); dropZone.classList.remove('has-file'); });
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || isConverting) return;
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 压缩中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+            const originalSize = selectedFile.size;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('quality', qualitySlider.value);
+            if (maxWidth.value) formData.append('max_width', maxWidth.value);
+            if (maxHeight.value) formData.append('max_height', maxHeight.value);
+
+            try {
+                const resp = await fetch('/api/convert/image-compress', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                if (!resp.ok) throw new Error('压缩失败');
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+                downloadLink.href = url;
+                downloadLink.download = selectedFile.name;
+                const saved = ((1 - blob.size / originalSize) * 100).toFixed(1);
+                sizeCompare.textContent = `📉 ${formatSize(originalSize)} → <strong>${formatSize(blob.size)}</strong>（节省 ${saved}%）`;
+                hide(progress);
+                show(resultDiv);
+            } catch (err) { showError(err.message); } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始压缩';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

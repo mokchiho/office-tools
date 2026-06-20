@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_compress.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_compress.title,
+        description=seo_meta.pdf_compress.description,
+        keywords=seo_meta.pdf_compress.keywords,
+        path=seo_meta.pdf_compress.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_compress.title.split(' - ')[0], 'url': seo_meta.pdf_compress.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon pdf">📦</div>
+            PDF 压缩
+        </h1>
+        <p class="page-desc">通过<strong>图像降采样</strong>和<strong>流压缩</strong>减小 PDF 体积。<br>
+        适用于扫描件、含大量图片的 PDF；纯文本 PDF 压缩效果有限。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放 PDF 文件到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <div id="params" class="param-group hidden" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 16px;">
+            <label class="input-label" style="display:block;font-size:14px;font-weight:600;color:#334155;margin-bottom:12px;">选择压缩级别</label>
+            <div class="level-selector">
+                <label class="level-option selected">
+                    <input type="radio" name="level" value="screen" checked>
+                    <div class="level-info">
+                        <div class="level-title">🖥️ 屏幕浏览 <span class="level-badge">推荐</span></div>
+                        <div class="level-desc">150 DPI，JPEG 质量 75。适合屏幕阅读、在线分享。<br>预期压缩比：<strong>原文件的 20-30%</strong></div>
+                    </div>
+                </label>
+                <label class="level-option">
+                    <input type="radio" name="level" value="email">
+                    <div class="level-info">
+                        <div class="level-title">📧 邮件附件</div>
+                        <div class="level-desc">100 DPI，JPEG 质量 60。适合邮件附件上传。<br>预期压缩比：<strong>原文件的 10-20%</strong></div>
+                    </div>
+                </label>
+                <label class="level-option">
+                    <input type="radio" name="level" value="extreme">
+                    <div class="level-info">
+                        <div class="level-title">🔧 极限压缩</div>
+                        <div class="level-desc">72 DPI，JPEG 质量 50。最强压缩，文字可读但图片有失真。<br>预期压缩比：<strong>原文件的 5-15%</strong></div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始压缩
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">压缩中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 压缩完成！</p>
+            <p id="sizeCompare" style="font-size:14px;color:#166534;margin-bottom:12px;"></p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载压缩后的 PDF</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li><strong>纯文本 PDF</strong>：压缩效果有限，通常仅 5-15%</li>
+                <li><strong>扫描件 / 含大量图片</strong>：压缩效果显著，通常 70-90% 体积减小</li>
+                <li>最大支持 <strong>200MB</strong> 的 PDF 文件</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "PDF 压缩的原理是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "通过降低 PDF 中图片的分辨率(DPI)和质量来减小体积,适合扫描件型 PDF。文字内容本身已高度压缩,不会损失。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "三档压缩有什么区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "轻度(150 DPI)质量保留最好,适合打印;中度(120 DPI)平衡;激进(72 DPI)体积最小,适合屏幕阅读。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "文字型 PDF 能压缩吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "文字型 PDF 本身已高度压缩,空间有限(通常 10-30%)。本工具对扫描件型 PDF 效果最显著。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的 PDF?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单文件最大 200MB,处理基于 pikepdf 库。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/pdf-split" class="related-tool-card">
+            <span class="related-tool-icon">✂️</span>
+            <span class="related-tool-name">PDF 拆分</span>
+        </a>
+        <a href="/image-compress" class="related-tool-card">
+            <span class="related-tool-icon">🖼️</span>
+            <span class="related-tool-name">图片压缩</span>
+        </a>
+        <a href="/pdf-watermark" class="related-tool-card">
+            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-name">PDF 加水印</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const params = document.getElementById('params');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const sizeCompare = document.getElementById('sizeCompare');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let isConverting = false;
+        const MAX_SIZE = 200 * 1024 * 1024;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.name.toLowerCase().endsWith('.pdf')) { showError('仅支持 .pdf 格式'); return; }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            show(fileInfo);
+            show(params);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+        }
+
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            show(errorDiv);
+            hide(resultDiv);
+        }
+
+        // Level selection
+        document.querySelectorAll('.level-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.level-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                opt.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+        removeBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            hide(fileInfo);
+            hide(params);
+            hide(convertBtn);
+            dropZone.classList.remove('has-file');
+        });
+
+        // Convert
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || isConverting) return;
+            const level = document.querySelector('input[name="level"]:checked').value;
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 压缩中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('level', level);
+            const originalSize = selectedFile.size;
+
+            try {
+                const resp = await fetch('/api/convert/pdf-compress', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                statusText.textContent = '压缩中...';
+                if (!resp.ok) throw new Error('压缩失败');
+
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+
+                const disp = resp.headers.get('Content-Disposition') || '';
+                const match = disp.match(/filename="?([^";]+)"?/);
+                const filename = match ? match[1] : 'compressed.pdf';
+
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                const newSize = blob.size;
+                const ratio = ((1 - newSize / originalSize) * 100).toFixed(1);
+                sizeCompare.innerHTML = `📉 ${formatSize(originalSize)} → <strong>${formatSize(newSize)}</strong>（节省 ${ratio}%）`;
+                hide(progress);
+                show(resultDiv);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始压缩';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.timestamp.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.timestamp.title,
+        description=seo_meta.timestamp.description,
+        keywords=seo_meta.timestamp.keywords,
+        path=seo_meta.timestamp.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.timestamp.title.split(' - ')[0], 'url': seo_meta.timestamp.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon code">⏱</div>
+            时间戳转换
+        </h1>
+        <p class="page-desc">Unix 时间戳与日期时间互转，支持 <strong>秒/毫秒自动识别</strong>。<br>
+        全部在浏览器本地处理，<strong>不经过服务器</strong>。</p>
+
+        <div class="tool-section">
+            <div class="tool-tabs">
+                <button class="tool-tab active" data-tab="ts2date">🕐 时间戳 → 日期</button>
+                <button class="tool-tab" data-tab="date2ts">📅 日期 → 时间戳</button>
+            </div>
+
+            <!-- Tab: 时间戳→日期 -->
+            <div id="tab-ts2date" class="tab-content active">
+                <div class="input-group">
+                    <label class="input-label">Unix 时间戳</label>
+                    <div class="input-row">
+                        <input type="text" id="tsInput" class="tool-input" placeholder="例如: 1718697600 或 1718697600000">
+                        <button id="tsNowBtn" class="btn-sm">🕒 当前时间</button>
+                    </div>
+                    <p class="input-hint">秒（≤ 9999999999）或 毫秒（> 9999999999）自动识别</p>
+                </div>
+
+                <div id="tsResult" class="result-box hidden">
+                    <div class="result-row">
+                        <span class="result-label">本地时间</span>
+                        <span class="result-value" id="tsLocal"></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">UTC 时间</span>
+                        <span class="result-value" id="tsUtc"></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">ISO 格式</span>
+                        <span class="result-value" id="tsIso"></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">星期</span>
+                        <span class="result-value" id="tsWeekday"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: 日期→时间戳 -->
+            <div id="tab-date2ts" class="tab-content">
+                <div class="input-group">
+                    <label class="input-label">日期时间</label>
+                    <input type="datetime-local" id="dtInput" class="tool-input">
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">自定义日期字符串</label>
+                    <input type="text" id="dtCustom" class="tool-input" placeholder="例如: 2025-06-18 15:30:00 或 2025/06/18">
+                </div>
+
+                <div id="dtResult" class="result-box hidden">
+                    <div class="result-row">
+                        <span class="result-label">秒级时间戳</span>
+                        <span class="result-value" id="dtSeconds"></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">毫秒级时间戳</span>
+                        <span class="result-value" id="dtMillis"></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">ISO 格式</span>
+                        <span class="result-value" id="dtIso"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>支持秒级（10 位）和毫秒级（13 位）Unix 时间戳</li>
+                <li>自动检测输入类型：≤ 9999999999 为秒，否则为毫秒</li>
+                <li>所有计算在浏览器本地完成，数据不上传服务器</li>
+                <li>快捷键：点击输入框可直接输入时间戳</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "什么是 Unix 时间戳?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Unix 时间戳是从 1970-01-01 00:00:00 UTC 起的秒数(或毫秒数),广泛用于程序和数据库中表示时间。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持秒和毫秒吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。自动识别 10 位(秒)和 13 位(毫秒)时间戳,转换结果中可一键复制两种格式。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "时区是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "默认显示北京时间(UTC+8)。如需其他时区请在结果中手动调整。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持负数时间戳吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。负数时间戳表示 1970 年之前的时间,可正常解析。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+        <a href="/qrcode" class="related-tool-card">
+            <span class="related-tool-icon">📱</span>
+            <span class="related-tool-name">二维码生成</span>
+        </a>
+        <a href="/hash-check" class="related-tool-card">
+            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-name">文件哈希校验</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const WEEKDAY_CN = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+        // Tab 切换
+        document.querySelectorAll('.tool-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // 时间戳→日期
+        const tsInput = document.getElementById('tsInput');
+        const tsResult = document.getElementById('tsResult');
+        const tsNowBtn = document.getElementById('tsNowBtn');
+
+        function updateTsToDate() {
+            const raw = tsInput.value.trim();
+            if (!raw) { hide(tsResult); return; }
+            const num = Number(raw);
+            if (isNaN(num) || num <= 0) { hide(tsResult); return; }
+
+            const isMillis = num > 9999999999;
+            const ms = isMillis ? num : num * 1000;
+            const d = new Date(ms);
+            if (isNaN(d.getTime())) { hide(tsResult); return; }
+
+            show(tsResult);
+            document.getElementById('tsLocal').textContent = d.toLocaleString('zh-CN');
+            document.getElementById('tsUtc').textContent = d.toUTCString();
+            document.getElementById('tsIso').textContent = d.toISOString();
+            document.getElementById('tsWeekday').textContent = WEEKDAY_CN[d.getDay()];
+        }
+
+        tsInput.addEventListener('input', updateTsToDate);
+        tsNowBtn.addEventListener('click', () => {
+            tsInput.value = Math.floor(Date.now() / 1000);
+            updateTsToDate();
+        });
+
+        // 日期→时间戳
+        const dtInput = document.getElementById('dtInput');
+        const dtCustom = document.getElementById('dtCustom');
+        const dtResult = document.getElementById('dtResult');
+
+        function setDefaultDatetime() {
+            const now = new Date();
+            const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+            dtInput.value = local.toISOString().slice(0, 16);
+            updateDateToTs();
+        }
+
+        function updateDateToTs() {
+            let d = null;
+
+            if (dtCustom.value.trim()) {
+                const parsed = Date.parse(dtCustom.value.trim());
+                if (!isNaN(parsed)) d = new Date(parsed);
+            }
+
+            if (!d && dtInput.value) {
+                d = new Date(dtInput.value);
+            }
+
+            if (!d || isNaN(d.getTime())) {
+                hide(dtResult);
+                return;
+            }
+
+            show(dtResult);
+            const ms = d.getTime();
+            const secs = Math.floor(ms / 1000);
+            document.getElementById('dtSeconds').textContent = secs;
+            document.getElementById('dtMillis').textContent = ms;
+            document.getElementById('dtIso').textContent = d.toISOString();
+        }
+
+        dtInput.addEventListener('change', updateDateToTs);
+        dtCustom.addEventListener('input', updateDateToTs);
+        setDefaultDatetime();
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

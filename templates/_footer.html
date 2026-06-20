@@ -1,0 +1,72 @@
+{# ── 全站页脚 ────────────────────────────────────────────
+   包含：站点信息、工具分类导航、版权、ICP 占位、隐私说明
+   用法: {% include '_footer.html' %}
+#}
+{% set base = site_url | default('https://tools.292029.xyz') %}
+
+<footer class="site-footer" role="contentinfo">
+    <div class="site-footer-inner">
+        <div class="site-footer-col">
+            <h3 class="site-footer-title">🛠 办公效率工具集</h3>
+            <p class="site-footer-desc">
+                免费、免注册、隐私安全的在线办公工具集合。
+                所有文件处理均在 30 分钟后自动清理。
+            </p>
+        </div>
+
+        <div class="site-footer-col">
+            <h4 class="site-footer-title">PDF 工具</h4>
+            <ul class="site-footer-list">
+                <li><a href="/pdf-to-word">PDF 转 Word</a></li>
+                <li><a href="/pdf-merge">PDF 合并</a></li>
+                <li><a href="/pdf-split">PDF 拆分</a></li>
+                <li><a href="/pdf-compress">PDF 压缩</a></li>
+                <li><a href="/pdf-watermark">PDF 加水印</a></li>
+                <li><a href="/pdf-encrypt">PDF 加密/解密</a></li>
+            </ul>
+        </div>
+
+        <div class="site-footer-col">
+            <h4 class="site-footer-title">图片 & 表格</h4>
+            <ul class="site-footer-list">
+                <li><a href="/image-compress">图片压缩</a></li>
+                <li><a href="/image-convert">图片格式转换</a></li>
+                <li><a href="/images-to-pdf">图片转 PDF</a></li>
+                <li><a href="/xls-to-xlsx">XLS 转 XLSX</a></li>
+                <li><a href="/csv-excel">CSV ↔ Excel</a></li>
+            </ul>
+        </div>
+
+        <div class="site-footer-col">
+            <h4 class="site-footer-title">编码 & 工具</h4>
+            <ul class="site-footer-list">
+                <li><a href="/hash-check">文件哈希校验</a></li>
+                <li><a href="/base64">Base64 编解码</a></li>
+                <li><a href="/json-tool">JSON 格式化</a></li>
+                <li><a href="/timestamp">时间戳转换</a></li>
+                <li><a href="/qrcode">二维码生成</a></li>
+            </ul>
+        </div>
+
+        <div class="site-footer-col">
+            <h4 class="site-footer-title">关于</h4>
+            <ul class="site-footer-list">
+                <li><a href="/">全部工具</a></li>
+                <li><a href="/sitemap.xml">站点地图</a></li>
+                <li><a href="/robots.txt">robots.txt</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="site-footer-bottom">
+        <p>
+            © 2025 <a href="/">办公效率工具集</a> ·
+            备案号 <a href="https://beian.miit.gov.cn/" rel="nofollow noopener" target="_blank">待备案</a> ·
+            使用 <a href="https://www.libreoffice.org/" rel="nofollow noopener" target="_blank">LibreOffice</a> &
+            <a href="https://github.com/ArtifexSoftware/pdf2docx" rel="nofollow noopener" target="_blank">pdf2docx</a> 构建
+        </p>
+        <p class="site-footer-privacy">
+            🔒 您的文件不会被永久存储,所有临时文件 30 分钟后自动清理。
+        </p>
+    </div>
+</footer>

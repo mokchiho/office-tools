@@ -1,10 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PDF → Word 转换 - 办公效率工具集</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_to_word.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_to_word.title,
+        description=seo_meta.pdf_to_word.description,
+        keywords=seo_meta.pdf_to_word.keywords,
+        path=seo_meta.pdf_to_word.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_to_word.title.split(' - ')[0], 'url': seo_meta.pdf_to_word.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
 </head>
 <body>
 <div class="container">
@@ -49,8 +65,10 @@
         <a id="downloadLink" class="btn btn-success" download>下载 DOCX</a>
     </div>
 
-    <div class="note">
-        <h3>📋 说明</h3>
+    <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+        <h3>使用说明</h3>
         <ul>
             <li>支持最大 500MB 的文件</li>
             <li>转换保留文本内容、段落结构、表格、简单格式</li>
@@ -59,6 +77,72 @@
             <li>建议先用小文件测试效果</li>
         </ul>
     </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "PDF 转 Word 后可以编辑吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以。转换后输出为标准 DOCX 格式,可在 Microsoft Word、WPS、LibreOffice 等任意文字处理软件中自由编辑。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持扫描件 PDF 吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。本工具集成 PP-OCRv6 OCR 引擎,可识别扫描件中的文字并转换为可编辑文本。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "会保留原 PDF 的排版吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "会。pdf2docx 引擎会尽力保留原始排版,包括段落、表格、字体、图片、超链接等元素。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的 PDF?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单文件最大 200MB。超大文件建议先用 PDF 压缩工具减小体积。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/pdf-split" class="related-tool-card">
+            <span class="related-tool-icon">✂️</span>
+            <span class="related-tool-name">PDF 拆分</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/pdf-encrypt" class="related-tool-card">
+            <span class="related-tool-icon">🔒</span>
+            <span class="related-tool-name">PDF 加密/解密</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
 </div>
 
 <script>
@@ -307,5 +391,7 @@
     }
 })();
 </script>
+    
+    {% include '_footer.html' %}
 </body>
 </html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_split.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_split.title,
+        description=seo_meta.pdf_split.description,
+        keywords=seo_meta.pdf_split.keywords,
+        path=seo_meta.pdf_split.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_split.title.split(' - ')[0], 'url': seo_meta.pdf_split.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon pdf">✂️</div>
+            PDF 拆分
+        </h1>
+        <p class="page-desc">从 PDF 中提取指定页面，<strong>合并为一个新 PDF 文件</strong>。<br>
+        支持连续区间��如 <code>1-5</code>）和离散页码（如 <code>1,3,5</code>）混合使用。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放 PDF 文件到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".pdf" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <div id="params" class="param-group hidden">
+            <div class="param-row">
+                <span class="param-label">页码范围</span>
+                <input type="text" id="pageInput" placeholder="例如: 1-3,5,7-9">
+            </div>
+            <div class="param-hint">
+                <strong>语法：</strong>逗号分隔多段；连字符表示范围（如 <code>1-5</code>）
+            </div>
+            <div class="examples">
+                <button class="example-chip" data-val="1-3">1-3</button>
+                <button class="example-chip" data-val="1,3,5">1,3,5</button>
+                <button class="example-chip" data-val="odd">奇数页</button>
+                <button class="example-chip" data-val="even">偶数页</button>
+            </div>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始拆分
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">拆分中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 拆分完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载拆分后的 PDF</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>输出 PDF 包含所有选中页面，按页码升序排列</li>
+                <li>支持语法示例：<code>1-3,5,7-9</code> 表示提取第 1,2,3,5,7,8,9 页</li>
+                <li>页码越界或格式错误会返回具体错误信息</li>
+                <li>仅支持 PDF 格式，最大 200MB</li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "支持哪些拆分方式?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持单页提取、多页提取、按页码范围(如 1-3,5,7-9)拆分,可灵活组合。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "拆分后每个 PDF 大小?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "拆分后的 PDF 仅包含指定的页面,文件大小相应减小。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最大支持多大的 PDF?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "单文件最大 200MB,处理基于 PyPDF2 库,速度快。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "会保留原始质量吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "会。拆分不会重新编码,完全保留原始 PDF 的内容、字体、图片质量。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-merge" class="related-tool-card">
+            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-name">PDF 合并</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/pdf-to-word" class="related-tool-card">
+            <span class="related-tool-icon">📄</span>
+            <span class="related-tool-name">PDF 转 Word</span>
+        </a>
+        <a href="/pdf-watermark" class="related-tool-card">
+            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-name">PDF 加水印</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const params = document.getElementById('params');
+        const pageInput = document.getElementById('pageInput');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFile = null;
+        let isConverting = false;
+        const MAX_SIZE = 200 * 1024 * 1024;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.name.toLowerCase().endsWith('.pdf')) {
+                showError('仅支持 .pdf 格式文件');
+                return;
+            }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            show(fileInfo);
+            show(params);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+        }
+
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            show(errorDiv);
+            hide(resultDiv);
+        }
+
+        // 示例
+        document.querySelectorAll('.example-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const val = chip.dataset.val;
+                if (val === 'odd' || val === 'even') {
+                    pageInput.value = val === 'odd' ? '1,3,5,7,9' : '2,4,6,8,10';
+                } else {
+                    pageInput.value = val;
+                }
+            });
+        });
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => handleFile(fileInput.files[0]));
+
+        removeBtn.addEventListener('click', () => {
+            selectedFile = null;
+            fileInput.value = '';
+            hide(fileInfo);
+            hide(params);
+            hide(convertBtn);
+            dropZone.classList.remove('has-file');
+        });
+
+        // Convert
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile || isConverting) return;
+            const pages = pageInput.value.trim();
+            if (!pages) { showError('请输入要提取的页码范围'); return; }
+
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 拆分中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+            statusText.textContent = '上传文件中...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            formData.append('pages', pages);
+
+            try {
+                const resp = await fetch('/api/convert/pdf-split', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                statusText.textContent = '拆分中...';
+
+                if (!resp.ok) {
+                    const data = await resp.json().catch(() => ({}));
+                    throw new Error(data.error || `服务器错误 (${resp.status})`);
+                }
+
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+
+                const disp = resp.headers.get('Content-Disposition') || '';
+                const match = disp.match(/filename="?([^";]+)"?/);
+                const filename = match ? match[1] : 'split.pdf';
+
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                hide(progress);
+                show(resultDiv);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始拆分';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

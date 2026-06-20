@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.pdf_merge.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.pdf_merge.title,
+        description=seo_meta.pdf_merge.description,
+        keywords=seo_meta.pdf_merge.keywords,
+        path=seo_meta.pdf_merge.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.pdf_merge.title.split(' - ')[0], 'url': seo_meta.pdf_merge.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon pdf">📚</div>
+            PDF 合并
+        </h1>
+        <p class="page-desc">将多个 PDF 文件合并为一个，<strong>按上传顺序排列</strong>。<br>
+        所有处理在服务器端即时完成，文件 30 分钟后自动清理。</p>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放 PDF 文件到此处</p>
+            <p class="upload-hint">或点击选择文件（支持多选）</p>
+            <input type="file" id="fileInput" accept=".pdf" multiple hidden>
+        </div>
+
+        <div id="fileList" class="file-list hidden"></div>
+        <div id="tip" class="tip hidden">💡 提示：点击 × 可移除单个文件</div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">
+            🚀 开始合并
+        </button>
+
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">合并中，请稍候...</p>
+        </div>
+
+        <div id="error" class="error hidden"></div>
+
+        <div id="result" class="result hidden">
+            <p>✅ 合并完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载合并后的 PDF</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>支持格式：仅 PDF</li>
+                <li>最多合并 <strong>20 个文件</strong>，每个最大 200MB</li>
+                <li>合并顺序与文件列表顺序一致（自上而下）</li>
+                <li>输出文件名格式：<code>merged_xxxxxxxx.pdf</code></li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "PDF 合并的顺序如何调整?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "上传文件后,可通过拖拽文件卡片调整合并顺序,文件将按从上到下的顺序拼接。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "最多能合并多少个文件?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "最多支持 20 个 PDF 文件同时合并,总大小不超过 200MB。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "会保留书签吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "会。本工具会保留原 PDF 中的书签和元数据,合并后仍可使用。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "输出格式是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "输出标准 PDF 格式,兼容所有 PDF 阅读器。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/pdf-split" class="related-tool-card">
+            <span class="related-tool-icon">✂️</span>
+            <span class="related-tool-name">PDF 拆分</span>
+        </a>
+        <a href="/pdf-compress" class="related-tool-card">
+            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-name">PDF 压缩</span>
+        </a>
+        <a href="/pdf-to-word" class="related-tool-card">
+            <span class="related-tool-icon">📄</span>
+            <span class="related-tool-name">PDF 转 Word</span>
+        </a>
+        <a href="/pdf-watermark" class="related-tool-card">
+            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-name">PDF 加水印</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const tip = document.getElementById('tip');
+        const convertBtn = document.getElementById('convertBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let selectedFiles = [];
+        let isConverting = false;
+        const MAX_FILES = 20;
+        const MAX_SIZE = 200 * 1024 * 1024;
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+
+        function renderFileList() {
+            fileList.innerHTML = '';
+            if (selectedFiles.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'file-list-empty';
+                empty.textContent = '尚未选择文件';
+                fileList.appendChild(empty);
+                return;
+            }
+            selectedFiles.forEach((f, i) => {
+                const item = document.createElement('div');
+                item.className = 'file-list-item';
+
+                const idx = document.createElement('span');
+                idx.className = 'file-list-index';
+                idx.textContent = i + 1;
+                const name = document.createElement('span');
+                name.className = 'file-list-name';
+                name.textContent = f.name;
+                const size = document.createElement('span');
+                size.className = 'file-list-size';
+                size.textContent = formatSize(f.size);
+                const rmBtn = document.createElement('button');
+                rmBtn.className = 'file-list-remove';
+                rmBtn.innerHTML = '✕';
+                rmBtn.addEventListener('click', () => {
+                    selectedFiles.splice(i, 1);
+                    if (selectedFiles.length === 0) {
+                        hide(fileList);
+                        hide(tip);
+                        hide(convertBtn);
+                        dropZone.classList.remove('has-file');
+                    } else {
+                        renderFileList();
+                    }
+                });
+
+                item.appendChild(idx);
+                item.appendChild(name);
+                item.appendChild(size);
+                item.appendChild(rmBtn);
+                fileList.appendChild(item);
+            });
+        }
+
+        function addFiles(files) {
+            const valid = [];
+            for (const f of files) {
+                if (!f.name.toLowerCase().endsWith('.pdf')) continue;
+                if (f.size > MAX_SIZE) {
+                    showError(`文件 "${f.name}" 超过 200MB 限制`);
+                    return;
+                }
+                if (selectedFiles.some(e => e.name === f.name && e.size === f.size)) continue;
+                valid.push(f);
+            }
+            if (valid.length === 0) {
+                showError('未添加有效 PDF 文件');
+                return;
+            }
+            if (selectedFiles.length + valid.length > MAX_FILES) {
+                showError(`最多支持 ${MAX_FILES} 个文件`);
+                return;
+            }
+            selectedFiles = selectedFiles.concat(valid);
+            renderFileList();
+            show(fileList);
+            show(tip);
+            show(convertBtn);
+            dropZone.classList.add('has-file');
+        }
+
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            show(errorDiv);
+            hide(resultDiv);
+        }
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) addFiles(Array.from(e.dataTransfer.files));
+        });
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => { addFiles(Array.from(fileInput.files)); fileInput.value = ''; });
+
+        // Convert
+        convertBtn.addEventListener('click', async () => {
+            if (selectedFiles.length < 2 || isConverting) return;
+            isConverting = true;
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '⏳ 合并中...';
+            hide(errorDiv);
+            hide(resultDiv);
+            progressBar.style.width = '0%';
+            show(progress);
+            statusText.textContent = `上传 ${selectedFiles.length} 个文件中...`;
+            progressBar.style.width = '20%';
+
+            const formData = new FormData();
+            for (const f of selectedFiles) formData.append('files', f);
+
+            try {
+                const resp = await fetch('/api/convert/pdf-merge', { method: 'POST', body: formData });
+                progressBar.style.width = '80%';
+                statusText.textContent = '合并中...';
+
+                if (!resp.ok) {
+                    const data = await resp.json().catch(() => ({}));
+                    throw new Error(data.error || `服务器错误 (${resp.status})`);
+                }
+
+                progressBar.style.width = '95%';
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                progressBar.style.width = '100%';
+                statusText.textContent = '完成 ✅';
+
+                const disp = resp.headers.get('Content-Disposition') || '';
+                const match = disp.match(/filename="?([^";]+)"?/);
+                const filename = match ? match[1] : `merged_${Date.now()}.pdf`;
+
+                downloadLink.href = url;
+                downloadLink.download = filename;
+                hide(progress);
+                show(resultDiv);
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                isConverting = false;
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '🚀 开始合并';
+            }
+        });
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

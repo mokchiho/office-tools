@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.qrcode.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.qrcode.title,
+        description=seo_meta.qrcode.description,
+        keywords=seo_meta.qrcode.keywords,
+        path=seo_meta.qrcode.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.qrcode.title.split(' - ')[0], 'url': seo_meta.qrcode.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon tool">📱</div>
+            二维码生成
+        </h1>
+        <p class="page-desc">生成可下载的二维码图片，支持 <strong>文本/网址/WiFi/邮箱/电话/短信</strong> 等多种类型。<br>
+        支持自定义颜色和纠错级别，可下载 <strong>PNG</strong>（位图）和 <strong>SVG</strong>（矢量）格式。</p>
+
+        <div class="type-tabs">
+            <button class="type-tab active" data-type="text">📝 文本</button>
+            <button class="type-tab" data-type="url">🔗 网址</button>
+            <button class="type-tab" data-type="wifi">📶 WiFi</button>
+            <button class="type-tab" data-type="email">📧 邮箱</button>
+            <button class="type-tab" data-type="phone">📞 电话</button>
+            <button class="type-tab" data-type="sms">💬 短信</button>
+        </div>
+
+        <div class="qr-grid">
+            <!-- 左：输入区 -->
+            <div>
+                <!-- 类型内容区：文本 -->
+                <div id="type-text" class="type-content active">
+                    <div class="option-section">
+                        <div class="option-section-title">📝 文本内容</div>
+                        <textarea id="textInput" class="qr-textarea" rows="4" placeholder="输入任意文本内容，支持中文、英文、特殊字符..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 类型内容区：网址 -->
+                <div id="type-url" class="type-content">
+                    <div class="option-section">
+                        <div class="option-section-title">🔗 网址 URL</div>
+                        <input type="text" id="urlInput" class="qr-input" placeholder="https://example.com">
+                    </div>
+                </div>
+
+                <!-- 类型内容区：WiFi -->
+                <div id="type-wifi" class="type-content">
+                    <div class="option-section">
+                        <div class="option-section-title">📶 网络名称</div>
+                        <div class="option-row">
+                            <span class="option-label">网络名称</span>
+                            <input type="text" id="wifiSsid" class="qr-input" placeholder="WiFi 名称 (SSID)">
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">密码</span>
+                            <input type="text" id="wifiPassword" class="qr-input" placeholder="WiFi 密码">
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">加密方式</span>
+                            <select id="wifiEncryption" class="qr-select">
+                                <option value="WPA">WPA/WPA2</option>
+                                <option value="WEP">WEP</option>
+                                <option value="nopass">无密码</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 类型内容区：邮箱 -->
+                <div id="type-email" class="type-content">
+                    <div class="option-section">
+                        <div class="option-section-title">📧 邮箱</div>
+                        <div class="option-row">
+                            <span class="option-label">收件人</span>
+                            <input type="text" id="emailTo" class="qr-input" placeholder="user@example.com">
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">主题</span>
+                            <input type="text" id="emailSubject" class="qr-input" placeholder="邮件主题（可选）">
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">正文</span>
+                            <input type="text" id="emailBody" class="qr-input" placeholder="邮件正文（可选）">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 类型内容区：电话 -->
+                <div id="type-phone" class="type-content">
+                    <div class="option-section">
+                        <div class="option-section-title">📞 电话号码</div>
+                        <input type="text" id="phoneInput" class="qr-input" placeholder="+8613800138000">
+                    </div>
+                </div>
+
+                <!-- 类型内容区：短信 -->
+                <div id="type-sms" class="type-content">
+                    <div class="option-section">
+                        <div class="option-section-title">💬 短信</div>
+                        <div class="option-row">
+                            <span class="option-label">收件人</span>
+                            <input type="text" id="smsTo" class="qr-input" placeholder="+8613800138000">
+                        </div>
+                        <div class="option-row">
+                            <span class="option-label">短信内容</span>
+                            <input type="text" id="smsBody" class="qr-input" placeholder="短信内容（可选）">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 样式设置 -->
+                <div class="option-section">
+                    <div class="option-section-title">🎨 样式设置</div>
+                    <div class="option-row">
+                        <span class="option-label">纠错级别</span>
+                        <select id="errorLevel" class="qr-select">
+                            <option value="L">低 (7%) - 简单内容</option>
+                            <option value="M" selected>中 (15%) - 一般内容</option>
+                            <option value="Q">较高 (25%) - 复杂内容</option>
+                            <option value="H">高 (30%) - 最大容错</option>
+                        </select>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">前景色</span>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="fgColor" value="#000000" class="color-input">
+                            <input type="text" id="fgColorText" value="#000000" maxlength="7" class="color-text-input">
+                        </div>
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">背景色</span>
+                        <div class="color-input-wrapper">
+                            <input type="color" id="bgColor" value="#ffffff" class="color-input">
+                            <input type="text" id="bgColorText" value="#ffffff" maxlength="7" class="color-text-input">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右：预览 -->
+            <div>
+                <div class="qr-preview">
+                    <div class="qr-canvas-wrap" id="qrCanvasWrap">
+                        <div class="qr-empty">输入内容即可预览</div>
+                    </div>
+                    <div class="qr-stats" id="qrStats"></div>
+                </div>
+
+                <div class="btn-row" style="justify-content: center; margin-top: 20px;">
+                    <button id="downloadPng" class="btn btn-success" disabled style="width:auto;padding:12px 32px;">
+                        📥 下载 PNG
+                    </button>
+                    <button id="downloadSvg" class="btn-sm" disabled style="padding:12px 24px;">
+                        📥 下载 SVG
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>纠错级别越高，二维码越 &quot;密&quot;，抗污损能力越强，但能存储的数据越少</li>
+                <li>WiFi 二维码扫描后可直接连接网络（需使用系统相机或支持扫码的 App）</li>
+                <li>SVG 格式为矢量图，适合印刷和大幅面展示；PNG 适合屏幕显示</li>
+                <li>生成请求为即时处理，<strong>服务器不保存任何输入内容</strong></li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "支持哪些类型二维码?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持纯文本、网址 URL、WiFi 配置(自动连接)、电子邮箱(自动发邮件)、电话号码(自动拨号)等多种类型。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "PNG 和 SVG 有什么区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PNG 是位图,适合屏幕显示和照片;SVG 是矢量图,可无限放大不失真,适合印刷和高质量场景。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "二维码会过期吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "本工具生成的二维码是静态的,内容由您输入,不会过期失效,无需联网即可扫描。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "可以自定义颜色吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "可以。支持自定义前景色和背景色,生成的二维码仍可被所有扫码软件识别。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>🔗 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+        <a href="/image-convert" class="related-tool-card">
+            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-name">图片格式转换</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+    </div>
+</section>
+        
+            </section>
+<script>
+    (function() {
+        let lastPngUrl = null;
+        let lastSvg = '';
+
+        // Tab 切换
+        document.querySelectorAll('.type-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.type-tab').forEach(function(t) { t.classList.remove('active'); });
+                document.querySelectorAll('.type-content').forEach(function(c) { c.classList.remove('active'); });
+                tab.classList.add('active');
+                var target = document.getElementById('type-' + tab.dataset.type);
+                if (target) target.classList.add('active');
+                scheduleUpdate();
+            });
+        });
+
+        function getCurrentType() {
+            var active = document.querySelector('.type-tab.active');
+            return active ? active.dataset.type : 'text';
+        }
+
+        function buildPayload() {
+            var type = getCurrentType();
+            if (type === 'text') return document.getElementById('textInput').value.trim();
+            if (type === 'url') return document.getElementById('urlInput').value.trim();
+            if (type === 'wifi') {
+                var ssid = document.getElementById('wifiSsid').value;
+                var password = document.getElementById('wifiPassword').value;
+                var enc = document.getElementById('wifiEncryption').value;
+                if (!ssid) return '';
+                return 'WIFI:T:' + enc + ';S:' + ssid.replace(/([\\;:])/g, '\$1') + ';P:' + password.replace(/([\\;:,])/g, '\$1') + ';;';
+            }
+            if (type === 'email') {
+                var to = document.getElementById('emailTo').value.trim();
+                if (!to) return '';
+                var subject = document.getElementById('emailSubject').value.trim();
+                var body = document.getElementById('emailBody').value.trim();
+                if (subject || body) {
+                    var params = [];
+                    if (subject) params.push('subject=' + encodeURIComponent(subject));
+                    if (body) params.push('body=' + encodeURIComponent(body));
+                    return 'mailto:' + to + '?' + params.join('&');
+                }
+                return 'mailto:' + to;
+            }
+            if (type === 'phone') {
+                var phone = document.getElementById('phoneInput').value.trim();
+                if (!phone) return '';
+                return 'tel:' + phone.replace(/[^\d+]/g, '');
+            }
+            if (type === 'sms') {
+                var to = document.getElementById('smsTo').value.trim();
+                var body = document.getElementById('smsBody').value;
+                if (!to) return '';
+                return body ? 'smsto:' + to + ':' + body : 'smsto:' + to;
+            }
+            return '';
+        }
+
+        // 防抖更新
+        var updateTimer = null;
+        function scheduleUpdate() {
+            clearTimeout(updateTimer);
+            updateTimer = setTimeout(updateQR, 250);
+        }
+
+        async function updateQR() {
+            var wrap = document.getElementById('qrCanvasWrap');
+            var stats = document.getElementById('qrStats');
+            var downloadPng = document.getElementById('downloadPng');
+            var downloadSvg = document.getElementById('downloadSvg');
+
+            var payload = buildPayload();
+            if (!payload) {
+                wrap.innerHTML = '<div class="qr-empty">输入内容即可预览</div>';
+                stats.innerHTML = '';
+                downloadPng.disabled = true;
+                downloadSvg.disabled = true;
+                if (lastPngUrl) { URL.revokeObjectURL(lastPngUrl); lastPngUrl = null; }
+                return;
+            }
+
+            var error_level = document.getElementById('errorLevel').value;
+            var fg_color = document.getElementById('fgColorText').value;
+            var bg_color = document.getElementById('bgColorText').value;
+
+            try {
+                var resp = await fetch('/api/qrcode', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ payload: payload, error_level: error_level, fg_color: fg_color, bg_color: bg_color, box_size: 10, border: 2 }),
+                });
+
+                if (!resp.ok) throw new Error('生成失败');
+
+                var data = await resp.json();
+                if (!data.success) throw new Error(data.error || '生成失败');
+
+                var pngBlob = base64ToBlob(data.png_base64, 'image/png');
+                if (lastPngUrl) URL.revokeObjectURL(lastPngUrl);
+                lastPngUrl = URL.createObjectURL(pngBlob);
+                lastSvg = data.svg;
+
+                wrap.innerHTML = '<img src="' + lastPngUrl + '" alt="QR Code">';
+                stats.innerHTML = '<strong>' + data.char_len + '</strong> 字符 · 纠错 <strong>' + error_level + '</strong> · 模块 <strong>' + data.modules + '×' + data.modules + '</strong>';
+                downloadPng.disabled = false;
+                downloadSvg.disabled = false;
+            } catch (err) {
+                wrap.innerHTML = '<div class="qr-empty" style="color:#ef4444;">' + err.message + '</div>';
+                downloadPng.disabled = true;
+                downloadSvg.disabled = true;
+            }
+        }
+
+        function base64ToBlob(b64, type) {
+            var bin = atob(b64);
+            var arr = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+            return new Blob([arr], { type: type });
+        }
+
+        // 监听输入
+        ['textInput', 'urlInput', 'wifiSsid', 'wifiPassword', 'wifiEncryption',
+         'emailTo', 'emailSubject', 'emailBody', 'phoneInput', 'smsTo', 'smsBody', 'errorLevel'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', scheduleUpdate);
+                el.addEventListener('change', scheduleUpdate);
+            }
+        });
+
+        // 颜色联动
+        function bindColor(colorInput, textInput) {
+            colorInput.addEventListener('input', function() {
+                textInput.value = colorInput.value.toUpperCase();
+                scheduleUpdate();
+            });
+            textInput.addEventListener('change', function() {
+                var v = textInput.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+                    colorInput.value = v;
+                    scheduleUpdate();
+                }
+            });
+        }
+        bindColor(document.getElementById('fgColor'), document.getElementById('fgColorText'));
+        bindColor(document.getElementById('bgColor'), document.getElementById('bgColorText'));
+
+        // 下载
+        document.getElementById('downloadPng').addEventListener('click', function() {
+            if (!lastPngUrl) return;
+            var a = document.createElement('a');
+            a.href = lastPngUrl;
+            a.download = 'qrcode_' + Date.now() + '.png';
+            a.click();
+        });
+
+        document.getElementById('downloadSvg').addEventListener('click', function() {
+            if (!lastSvg) return;
+            var blob = new Blob([lastSvg], { type: 'image/svg+xml' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'qrcode_' + Date.now() + '.svg';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    })();
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

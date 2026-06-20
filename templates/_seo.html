@@ -1,0 +1,154 @@
+{# ── SEO 通用宏 ────────────────────────────────────────────
+   用法（在 head 中调用）:
+   {% import '_seo.html' as seo %}
+   {{ seo.head(
+       title='页面标题 - 办公效率工具集',
+       description='页面描述 80-160 字...',
+       keywords='关键词1,关键词2,关键词3',
+       path='/path-of-page',
+       jsonld_type='WebApplication',       # 'WebSite' | 'WebApplication'
+       jsonld_extra={...},                  # 可选：合并到 JSON-LD
+       og_image=None,                       # 可选：自定义 og:image 路径
+   ) }}
+#}
+{% macro head(title, description, keywords, path, jsonld_type='WebApplication', jsonld_extra=None, og_image=None) -%}
+{# 站点 URL 在 app.py context processor 中注入为 site_url #}
+{% set base = site_url | default('https://tools.292029.xyz') %}
+{% set abs_url = base.rstrip('/') ~ path %}
+{% set default_og_image = base.rstrip('/') ~ '/static/favicon.svg' %}
+{% set og_img = og_image or default_og_image %}
+{% set site_name = '办公效率工具集' %}
+{# ── JSON-LD 构造 ── #}
+{% if jsonld_type == 'WebSite' %}
+  {% set ld = {
+       '@context': 'https://schema.org',
+       '@type': 'WebSite',
+       'name': site_name,
+       'url': base,
+       'description': '免费的在线办公效率工具集,PDF/图片/编码转换,无需注册,保护隐私。',
+       'inLanguage': 'zh-CN',
+       'potentialAction': {
+         '@type': 'SearchAction',
+         'target': base ~ '/?q={search_term_string}',
+         'query-input': 'required name=search_term_string'
+       }
+     } %}
+{% else %}
+  {% set ld = {
+       '@context': 'https://schema.org',
+       '@type': 'WebApplication',
+       'name': title.split(' - ')[0] if ' - ' in title else title,
+       'url': abs_url,
+       'description': description,
+       'applicationCategory': 'UtilitiesApplication',
+       'operatingSystem': 'Any',
+       'inLanguage': 'zh-CN',
+       'offers': {
+         '@type': 'Offer',
+         'price': '0',
+         'priceCurrency': 'CNY'
+       },
+       'isPartOf': {
+         '@type': 'WebSite',
+         'name': site_name,
+         'url': base
+       }
+     } %}
+{% endif %}
+{% if jsonld_extra %}
+  {% set _ = ld.update(jsonld_extra) %}
+{% endif %}
+
+<meta name="description" content="{{ description }}">
+<meta name="keywords" content="{{ keywords }}">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="办公效率工具集">
+<meta name="generator" content="office-tools">
+
+<link rel="canonical" href="{{ abs_url }}">
+<link rel="icon" type="image/svg+xml" href="{{ base.rstrip('/') }}/static/favicon.svg">
+<link rel="icon" type="image/png" href="{{ base.rstrip('/') }}/static/favicon.svg">
+<link rel="apple-touch-icon" href="{{ base.rstrip('/') }}/static/favicon.svg">
+<link rel="alternate" type="application/rss+xml" title="{{ site_name }} Sitemap" href="{{ base.rstrip('/') }}/sitemap.xml">
+
+<!-- Open Graph -->
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{{ title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:url" content="{{ abs_url }}">
+<meta property="og:type" content="{{ jsonld_type == 'WebSite' and 'website' or 'website' }}">
+<meta property="og:image" content="{{ og_img }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ title }}">
+<meta property="og:locale" content="zh_CN">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ title }}">
+<meta name="twitter:description" content="{{ description }}">
+<meta name="twitter:image" content="{{ og_img }}">
+<meta name="twitter:image:alt" content="{{ title }}">
+
+<!-- JSON-LD 结构化数据 -->
+<script type="application/ld+json">
+{{ ld | tojson(indent=2) }}
+</script>
+{%- endmacro %}
+
+
+{#
+  ── 面包屑 JSON-LD 宏 ──
+  用法: {{ seo.breadcrumb([{'name':'首页','url':'/'}, {'name':'PDF转Word','url':'/pdf-to-word'}]) }}
+#}
+{% macro breadcrumb(crumbs) -%}
+{% set base = site_url | default('https://tools.292029.xyz') %}
+{% set items = [] %}
+{% for c in crumbs %}
+  {% set _ = items.append({
+       '@type': 'ListItem',
+       'position': loop.index,
+       'name': c.name,
+       'item': base.rstrip('/') ~ c.url
+     }) %}
+{% endfor %}
+{% set ld = {
+     '@context': 'https://schema.org',
+     '@type': 'BreadcrumbList',
+     'itemListElement': items
+   } %}
+<script type="application/ld+json">
+{{ ld | tojson(indent=2) }}
+</script>
+{%- endmacro %}
+
+
+{#
+  ── FAQPage JSON-LD 宏 ──
+  用法:
+  {{ seo.faq([
+       {'q': '支持哪些格式?', 'a': '支持 ...'},
+       {'q': '文件安全吗?', 'a': '30 分钟自动清理...'},
+  ]) }}
+#}
+{% macro faq(qas) -%}
+{% set items = [] %}
+{% for qa in qas %}
+  {% set _ = items.append({
+       '@type': 'Question',
+       'name': qa.q,
+       'acceptedAnswer': {
+         '@type': 'Answer',
+         'text': qa.a
+       }
+     }) %}
+{% endfor %}
+{% set ld = {
+     '@context': 'https://schema.org',
+     '@type': 'FAQPage',
+     'mainEntity': items
+   } %}
+<script type="application/ld+json">
+{{ ld | tojson(indent=2) }}
+</script>
+{%- endmacro %}

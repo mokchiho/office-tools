@@ -23,6 +23,8 @@
 | 转换引擎 | LibreOffice (calc + writer) | XLS → XLSX |
 | 转换引擎 | pdf2docx (PyMuPDF) | PDF → DOCX（电子 PDF）|
 | 转换引擎 | RapidOCR (ONNX Runtime) | PDF扫描件 → DOCX |
+| PDF 工具 | pypdf | PDF 合并 / 拆分 |
+| PDF 工具 | pikepdf | PDF 压缩（图像降采样 + 流压缩）|
 
 ---
 
@@ -63,7 +65,8 @@ chmod 755 /opt/office-tools/uploads /opt/office-tools/output
 cd /opt/office-tools
 python3 -m venv venv
 venv/bin/pip install gunicorn pdf2docx flask \
-                   rapidocr_onnxruntime onnxruntime pdf2image python-docx Pillow
+                   rapidocr_onnxruntime onnxruntime pdf2image python-docx Pillow \
+                   pypdf pikepdf qrcode
 ```
 
 ### 4. 配置 Supervisor

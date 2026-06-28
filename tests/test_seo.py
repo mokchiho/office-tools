@@ -20,7 +20,8 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from app import app, _SEO_META  # noqa: E402
+from app import app
+from config import SEO_META as _SEO_META  # noqa: E402
 
 PAGES: list[tuple[str, str, str]] = [
     # (url, template_filename, slug_in_seo_meta)
@@ -258,7 +259,10 @@ class TestGlobalConsistency(unittest.TestCase):
 
     def test_site_url_constant(self):
         app_py = (ROOT / "app.py").read_text(encoding="utf-8")
-        self.assertRegex(app_py, r"SITE_URL\s*=", "app.py 缺少 SITE_URL 常量")
+        self.assertRegex(app_py, r"SITE_URL", "app.py 缺少 SITE_URL 引用")
+        # 同时检查 config.py 中有定义
+        config_py = (ROOT / "config.py").read_text(encoding="utf-8")
+        self.assertRegex(config_py, r"SITE_URL\s*=", "config.py 缺少 SITE_URL 常量")
 
     def test_sitemap_xml_returns_valid_xml(self):
         client = app.test_client()
@@ -349,7 +353,7 @@ class TestGlobalConsistency(unittest.TestCase):
 
     def test_seo_meta_config_complete(self):
         """_SEO_META 应包含全部 17 个 slug, 且每个有 title/description/keywords/path"""
-        self.assertEqual(len(_SEO_META), 17, f"_SEO_META 应有 17 项, 实际 {len(_SEO_META)}")
+        self.assertEqual(len(_SEO_META), 18, f"_SEO_META 应有 18 项, 实际 {len(_SEO_META)}")
         for slug, meta in _SEO_META.items():
             for k in ("title", "description", "keywords"):
                 self.assertIn(k, meta, f"_SEO_META[{slug!r}] 缺 {k}")

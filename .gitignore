@@ -10,6 +10,7 @@ build/
 # 运行时生成的文件
 uploads/
 output/
+logs/
 *.log
 
 # 系统文件
@@ -19,11 +20,25 @@ Thumbs.db
 *.swo
 *~
 
-# 环境配置
+# 环境配置（敏感）
 .env
 .env.local
+.env.*.local
 
 # IDE
 .idea/
 .vscode/
 *.sublime-*
+
+# 测试覆盖率
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Celery/RQ
+celerybeat-schedule
+celerybeat.pid
+
+# Docker
+*.dockerignore
+docker-compose.override.yml

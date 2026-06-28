@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: office-tools
+    restart: unless-stopped
+    ports:
+      - "8200:8200"
+    volumes:
+      - uploads:/app/uploads
+      - output:/app/output
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - SITE_URL=${SITE_URL:-https://tools.292029.xyz}
+      - FLASK_ENV=production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  uploads:
+  output:

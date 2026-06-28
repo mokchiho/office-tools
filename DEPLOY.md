@@ -9,40 +9,40 @@
 
 ```
 用户 → Nginx (HTTPS 443) → Gunicorn (WSGI, 127.0.0.1:8200, 1 worker + gthread 4) → Flask App
+                                                                ├── config.py (配置中心)
+                                                                ├── utils/ (工具模块)
+                                                                │   ├── logging_config.py  日志系统
+                                                                │   ├── cleanup.py          文件清理
+                                                                │   ├── download.py         下载响应
+                                                                │   └── rate_limit.py       限流
+                                                                ├── services/ (业务服务)
+                                                                │   └── ocr_service.py      OCR 异步识别
                                                                 ├── XLS → XLSX (LibreOffice)
                                                                 ├── PDF → DOCX (pdf2docx)
                                                                 └── PDF扫描件 → DOCX (RapidOCR ONNX)
 ```
 
-| 组件 | 技术 | 说明 |
-|------|------|------|
-| Web 服务器 | Nginx | HTTPS 终止、反向代理、静态文件服务 |
-| 应用服务器 | Gunicorn | WSGI 接口，1 worker + 4 线程（gthread）|
-| 进程管理 | Supervisor | 守护进程，自动重启 |
-| SSL | Let's Encrypt (certbot) | 自动续期 |
-| 转换引擎 | LibreOffice (calc + writer) | XLS → XLSX |
-| 转换引擎 | pdf2docx (PyMuPDF) | PDF → DOCX（电子 PDF）|
-| 转换引擎 | RapidOCR (ONNX Runtime) | PDF扫描件 → DOCX |
-| 转换引擎 | OpenCC + python-docx/openpyxl/python-pptx | Office 简繁转换 |
-| PDF 工具 | pypdf | PDF 合并 / 拆分 |
-| PDF 工具 | pikepdf | PDF 压缩（图像降采样 + 流压缩）|
+## 前置检查
+
+部署前确保以下文件已就绪：
+
+```
+.env       # SECRET_KEY 等环境配置（从 .env.example 复制修改）
+```
+
+检查 `.env` 中的 `SECRET_KEY` 已设置（生产环境必须）：
+
+```bash
+grep SECRET_KEY .env
+# 如果不是随机字符串，请生成:
+openssl rand -hex 32
+```
 
 ---
 
-## 首次部署
+## 存档部署
 
-### 1. 服务器环境
-
-```bash
-# 安装系统依赖
-ssh root@rn.292029.xyz
-apt-get update
-apt-get install -y python3-pip python3-venv nginx supervisor certbot python3-certbot-nginx
-apt-get install -y libreoffice-writer-nogui libreoffice-calc-nogui
-apt-get install -y poppler-utils  # pdf2image 依赖（OCR 需要）
-```
-
-### 2. 上传项目文件
+### 1. 上传项目文件
 
 ```bash
 cd /home/mokch/projects/office-tools
@@ -53,10 +53,12 @@ rsync -avz --delete \
   --exclude='output' \
   --exclude='__pycache__' \
   --exclude='*.pyc' \
+  --exclude='logs' \
+  --exclude='.env' \
   ./ root@rn.292029.xyz:/opt/office-tools/
 ```
 
-### 3. 服务器端安装 Python 依赖
+### 2. 服务器端安装依赖
 
 ```bash
 ssh root@rn.292029.xyz
@@ -65,18 +67,19 @@ chmod 755 /opt/office-tools/uploads /opt/office-tools/output
 
 cd /opt/office-tools
 python3 -m venv venv
-venv/bin/pip install gunicorn pdf2docx flask \
-                   rapidocr_onnxruntime onnxruntime pdf2image python-docx Pillow \
-                   pypdf pikepdf qrcode \
-                   opencc-python-reimplemented python-pptx openpyxl
+venv/bin/pip install -r requirements.txt -q
+
+# 设置环境变量
+cp .env.example .env
+# 编辑 .env 设置 SECRET_KEY
 ```
 
-### 4. 配置 Supervisor
+### 3. 配置 Supervisor
 
 ```bash
 cat > /etc/supervisor/conf.d/office-tools.conf << 'EOF'
 [program:office-tools]
-command=/opt/office-tools/venv/bin/gunicorn --worker-class=gthread --workers=1 --threads=4 -b 127.0.0.1:8200 --timeout 1200 app:app
+command=/opt/office-tools/venv/bin/gunicorn --worker-class=gthread --workers=1 --threads=4 -b 127.0.0.1:8200 --timeout 1200 --access-logfile /var/log/office-tools-access.log app:app
 directory=/opt/office-tools
 user=root
 autostart=true
@@ -85,7 +88,7 @@ stopasgroup=true
 killasgroup=true
 stdout_logfile=/var/log/office-tools.log
 stderr_logfile=/var/log/office-tools.err.log
-environment=HOME="/root"
+environment=HOME="/root",SECRET_KEY="your-production-secret"
 EOF
 
 > **架构说明：** 由于 OCR 任务需要跨请求共享内存中的任务状态（task_id → progress/status），
@@ -98,40 +101,26 @@ supervisorctl start office-tools
 supervisorctl status      # 确认 RUNNING
 ```
 
-### 5. 配置 Nginx + SSL
+### 4. 配置 Nginx + SSL（同上）
+
+---
+
+## Docker 部署（推荐）
 
 ```bash
-cat > /etc/nginx/sites-available/tools.292029.xyz << 'NGINX'
-server {
-    listen 80;
-    listen [::]:80;
-    server_name tools.292029.xyz;
+# 1. 构建镜像
+docker build -t office-tools .
 
-    client_max_body_size 500M;
-    proxy_read_timeout 600s;
-    proxy_send_timeout 600s;
+# 2. 创建 .env 文件
+cp .env.example .env
+# 编辑 .env 设置 SECRET_KEY
 
-    location / {
-        proxy_pass http://127.0.0.1:8200;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-NGINX
+# 3. 启动
+docker compose up -d
 
-ln -sf /etc/nginx/sites-available/tools.292029.xyz /etc/nginx/sites-enabled/
-nginx -t && nginx -s reload
+# 4. 检查
+docker compose logs -f
 ```
-
-**SSL（仅首次）：**
-
-```bash
-certbot --nginx -d tools.292029.xyz --non-interactive --agree-tos --email admin@292029.xyz
-```
-
-SSL 证书自动续期（certbot 已配置 systemd timer，无需手动操作）。
 
 ---
 
@@ -140,17 +129,38 @@ SSL 证书自动续期（certbot 已配置 systemd timer，无需手动操作）
 ```bash
 cd /home/mokch/projects/office-tools
 
-# 1. 上传文件
+# 1. 上传文件（排除运行时数据）
 rsync -avz --delete \
   --exclude='venv' \
   --exclude='uploads' \
   --exclude='output' \
   --exclude='__pycache__' \
   --exclude='*.pyc' \
+  --exclude='logs' \
+  --exclude='.env' \
   ./ root@rn.292029.xyz:/opt/office-tools/
 
-# 2. 重启服务
+# 2. 更新依赖（如有变更）
+ssh root@rn.292029.xyz "cd /opt/office-tools && venv/bin/pip install -r requirements.txt -q"
+
+# 3. 重启服务
 ssh root@rn.292029.xyz "supervisorctl restart office-tools"
+```
+
+---
+
+## 健康检查
+
+部署后验证：
+
+```bash
+# 基础
+curl https://tools.292029.xyz/health
+# {"status":"ok","uptime_seconds":123.45,"version":"1.0.0"}
+
+# 组件就绪检查
+curl https://tools.292029.xyz/readiness
+# {"status":"ready","checks":{"upload_dir":true,"output_dir":true}}
 ```
 
 ---
@@ -163,6 +173,8 @@ ssh root@rn.292029.xyz "supervisorctl restart office-tools"
 | 重启服务 | `supervisorctl restart office-tools` |
 | 查看日志 | `tail -f /var/log/office-tools.log` |
 | 查看错误 | `tail -f /var/log/office-tools.err.log` |
+| 查看应用日志 | `tail -f /opt/office-tools/logs/app.log` |
+| 查看错误日志 | `tail -f /opt/office-tools/logs/error.log` |
 | 重载 Nginx | `nginx -s reload` |
 | SSL 续期测试 | `certbot renew --dry-run` |
 

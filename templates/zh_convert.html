@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.zh_convert.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {{ seo_macros.head(
+        title=seo_meta.zh_convert.title,
+        description=seo_meta.zh_convert.description,
+        keywords=seo_meta.zh_convert.keywords,
+        path=seo_meta.zh_convert.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.zh_convert.title.split(' - ')[0], 'url': seo_meta.zh_convert.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+
+        <h1>
+            <div class="tool-icon excel">字</div>
+            Office 文档简繁转换
+        </h1>
+        <p class="page-desc">在线将 Word、Excel、PowerPoint 文档的<strong>简体中文</strong>与<strong>繁体中文</strong>互相转换。<br>基于 OpenCC 引擎，<strong>完整保留原排版、字体、表格、图表</strong>。支持新旧 Office 格式。</p>
+
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="s2t">🔤 简体 → 繁体</button>
+            <button class="mode-tab" data-mode="t2s">🔡 繁体 → 简体</button>
+        </div>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">📂</div>
+            <p class="upload-text">拖放 Office 文档到此处</p>
+            <p class="upload-hint">或点击选择文件</p>
+            <input type="file" id="fileInput" accept=".doc,.docx,.ppt,.pptx,.xls,.xlsx" hidden>
+        </div>
+
+        <div id="fileInfo" class="file-info hidden">
+            <span id="fileName"></span>
+            <span id="fileSize"></span>
+            <button id="removeBtn" class="btn-remove">✕</button>
+        </div>
+
+        <button id="convertBtn" class="btn btn-primary hidden">🚀 开始转换</button>
+        <div id="progress" class="progress hidden">
+            <div class="progress-bar" id="progressBar"></div>
+            <p id="statusText">转换中...</p>
+        </div>
+        <div id="error" class="error hidden"></div>
+        <div id="result" class="result hidden">
+            <p>✅ 转换完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>📥 下载文件</a>
+        </div>
+
+        <section class="faq">
+            <h2>❓ 常见问题</h2>
+            <div class="note">
+                <h3>使用说明</h3>
+                <ul>
+                    <li><strong>支持格式：</strong>Word (.doc / .docx)、Excel (.xls / .xlsx)、PowerPoint (.ppt / .pptx)</li>
+                    <li><strong>保留原排版：</strong>字体、字号、颜色、段落、表格、图表全部保留</li>
+                    <li><strong>旧格式支持：</strong>.doc / .xls / .ppt 上传后自动转新格式后处理</li>
+                    <li><strong>处理速度：</strong>OpenCC 引擎极快，秒级完成</li>
+                    <li><strong>隐私保护：</strong>文件 30 分钟后自动清理，不会在服务器上保留</li>
+                </ul>
+            </div>
+
+            <h3>关于 OpenCC 词表</h3>
+            <div class="note">
+                <p>本工具使用 OpenCC 标准词表（<code>s2t</code> / <code>t2s</code>），覆盖通用词汇和常见术语。部分专业术语（如医学、法律）可能与台湾/香港本地用法略有差异。</p>
+            </div>
+        </section>
+
+        <section class="related-tools" aria-label="相关工具">
+            <h2>🔗 相关工具</h2>
+            <div class="related-tools-grid">
+                <a href="/csv-excel" class="related-tool-card">
+                    <span class="related-tool-icon">🔄</span>
+                    <span class="related-tool-name">CSV ↔ Excel 转换</span>
+                </a>
+                <a href="/xls-to-xlsx" class="related-tool-card">
+                    <span class="related-tool-icon">📊</span>
+                    <span class="related-tool-name">XLS 转 XLSX</span>
+                </a>
+                <a href="/pdf-to-word" class="related-tool-card">
+                    <span class="related-tool-icon">📄</span>
+                    <span class="related-tool-name">PDF 转 Word</span>
+                </a>
+                <a href="/base64" class="related-tool-card">
+                    <span class="related-tool-icon">🔐</span>
+                    <span class="related-tool-name">Base64 编解码</span>
+                </a>
+            </div>
+        </section>
+
+        <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "支持哪些 Office 文档格式？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "支持 Word (.doc / .docx)、Excel (.xls / .xlsx)、PowerPoint (.ppt / .pptx) 共 6 种格式。.doc / .xls / .ppt 旧格式上传后会自动转为新格式后处理。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "转换后格式/字体/排版会丢失吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。本工具只修改文本内容（run.text / cell.value），所有样式属性（字体、字号、颜色、段落、表格、图表）完整保留。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "处理速度如何？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "基于 OpenCC 引擎，处理速度极快，秒级完成。旧格式文档（.doc/.xls/.ppt）需先用 LibreOffice 转换格式，约 1-30 秒。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "数据安全吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "文件处理后会在 30 分钟内自动删除。下载完成后也会立即清理临时文件，不会在服务器长期保留。"
+      }
+    }
+  ]
+}
+        </script>
+    </div>
+
+<script>
+        // 模式切换
+        const modeTabs = document.querySelectorAll('.mode-tab');
+        let currentDirection = 's2t';
+        modeTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                modeTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentDirection = tab.dataset.mode;
+                // 清空已选文件，避免方向混淆
+                file = null;
+                hide(fileInfo);
+                hide(convertBtn);
+                hide(progress);
+                hide(error);
+                hide(result);
+                dropZone.classList.remove('has-file');
+                fileInput.value = '';
+            });
+        });
+
+        // 工具函数
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+        function show(el) { el.classList.remove('hidden'); }
+        function hide(el) { el.classList.add('hidden'); }
+        function setError(msg) {
+            error.textContent = msg;
+            show(error);
+            hide(progress);
+        }
+        function setStatus(msg, pct) {
+            statusText.textContent = msg;
+            if (pct !== undefined) progressBar.style.width = pct + '%';
+        }
+
+        // 元素引用
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const convertBtn = document.getElementById('convertBtn');
+        const removeBtn = document.getElementById('removeBtn');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const error = document.getElementById('error');
+        const result = document.getElementById('result');
+        const downloadLink = document.getElementById('downloadLink');
+        let file = null;
+
+        // 上传交互
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) handleFile(fileInput.files[0]);
+        });
+        removeBtn.addEventListener('click', () => {
+            file = null;
+            fileInput.value = '';
+            hide(fileInfo);
+            hide(convertBtn);
+            hide(progress);
+            hide(error);
+            hide(result);
+            dropZone.classList.remove('has-file');
+        });
+
+        const ALLOWED = ['.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx'];
+        function handleFile(f) {
+            const ext = '.' + f.name.split('.').pop().toLowerCase();
+            if (!ALLOWED.includes(ext)) {
+                alert('不支持的文件类型 "' + ext + '"，仅支持：' + ALLOWED.join(' '));
+                return;
+            }
+            file = f;
+            fileName.textContent = f.name;
+            fileSize.textContent = formatSize(f.size);
+            show(fileInfo);
+            dropZone.classList.add('has-file');
+            show(convertBtn);
+            hide(progress);
+            hide(error);
+            hide(result);
+        }
+
+        // 转换
+        convertBtn.addEventListener('click', async () => {
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('direction', currentDirection);
+            show(progress);
+            setStatus('上传并转换中（大型文档可能需要 10-30 秒）...', 30);
+            hide(error);
+            hide(result);
+            convertBtn.disabled = true;
+            try {
+                const resp = await fetch('/api/convert/zh-convert', {
+                    method: 'POST', body: formData,
+                });
+                if (!resp.ok) {
+                    let msg = '转换失败';
+                    try {
+                        const j = await resp.json();
+                        msg = j.error || msg;
+                    } catch (e) {}
+                    setError(msg);
+                    return;
+                }
+                // 推断输出扩展名
+                const originalExt = '.' + file.name.split('.').pop().toLowerCase();
+                const oldToNew = {'.doc': '.docx', '.xls': '.xlsx', '.ppt': '.pptx'};
+                const outExt = oldToNew[originalExt] || originalExt;
+                const suffix = currentDirection === 's2t' ? '_s2t' : '_t2s';
+                const stem = file.name.replace(/\.[^.]+$/, '');
+                const downloadName = stem + suffix + outExt;
+
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                downloadLink.href = url;
+                downloadLink.download = downloadName;
+                setStatus('转换完成！', 100);
+                setTimeout(() => {
+                    hide(progress);
+                    show(result);
+                }, 200);
+            } catch (e) {
+                setError('网络错误: ' + e.message);
+            } finally {
+                convertBtn.disabled = false;
+            }
+        });
+</script>
+
+    {% include '_footer.html' %}
+</body>
+</html>

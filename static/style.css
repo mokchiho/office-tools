@@ -461,6 +461,48 @@ body::before {
     font-size: 16px;
 }
 
+/* ── 模式 Tab（mode-tabs，用于双向转换工具的简繁/格式切换） ── */
+.mode-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 24px 0;
+    padding: 6px;
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.mode-tab {
+    flex: 1;
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.mode-tab:hover {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--gray-800);
+}
+
+.mode-tab.active {
+    background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+    transform: translateY(-1px);
+}
+
+.mode-tab.active:hover {
+    background: linear-gradient(135deg, var(--primary-600), var(--accent-600));
+    color: white;
+}
+
 /* ── 工具网格 ── */
 .tool-grid {
     display: grid;

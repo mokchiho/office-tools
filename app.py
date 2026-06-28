@@ -167,6 +167,12 @@ _SEO_META: dict = {
         'keywords': 'CSV转Excel,Excel转CSV,CSV转换,编码识别,中文乱码,UTF-8,GBK,在线转换',
         'path': '/csv-excel',
     },
+    'zh_convert': {
+        'title': 'Office 文档简繁转换工具 - Word/Excel/PPT 在线互转',
+        'description': '在线将 Word (.doc/.docx)、Excel (.xls/.xlsx)、PowerPoint (.ppt/.pptx) 文档进行简体与繁体中文互转，基于 OpenCC 引擎，完整保留原排版、字体、表格、图表。支持 6 种 Office 格式。',
+        'keywords': '简繁转换,繁体转换,简体转繁体,繁体转简体,Word简繁,Excel简繁,PPT简繁,OpenCC,在线转换,文档转换',
+        'path': '/zh-convert',
+    },
 }
 
 
@@ -189,7 +195,15 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 ALLOWED_EXT_XLS = {'.xls'}
 ALLOWED_EXT_PDF = {'.pdf'}
 ALLOWED_EXT_IMAGE = {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif', '.tiff'}
+ALLOWED_EXT_OFFICE = {'.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx'}
 MAX_IMAGES_TO_PDF = 10
+
+# 简繁转换方向：旧格式 → 新格式映射（LibreOffice 预处理）
+_ZH_OLD_TO_NEW_EXT = {'.doc': '.docx', '.xls': '.xlsx', '.ppt': '.pptx'}
+# 简繁转换方向对应文件后缀
+_ZH_DIRECTION_SUFFIX = {'s2t': '_s2t', 't2s': '_t2s'}
+# 合法方向
+_ZH_VALID_DIRECTIONS = {'s2t', 't2s'}
 
 # ── OCR 异步任务 ──
 # 任务存储：task_id -> {status, progress, total, message, error, src_path, dst_path, src_filename, started_at}
@@ -1228,6 +1242,212 @@ def _pil_prepare_for_jpeg(img, bg_color='white'):
 
 
 
+# ── 简繁转换 (Office 文档) ─────────────────────────────────
+
+# OpenCC 转换器单例：s2t (简→繁) / t2s (繁→简)
+_zh_converters: dict = {}
+_zh_converter_lock = threading.Lock()
+
+
+def _get_zh_converter(direction: str):
+    """获取 OpenCC 转换器单例。direction: 's2t' | 't2s'"""
+    if direction in _zh_converters:
+        return _zh_converters[direction]
+    with _zh_converter_lock:
+        if direction not in _zh_converters:
+            import opencc
+            _zh_converters[direction] = opencc.OpenCC(direction)
+    return _zh_converters[direction]
+
+
+def _zh_convert_docx(src_path: Path, dst_path: Path, convert_fn) -> dict:
+    """docx 简繁转换：遍历 paragraphs/tables/headers/footers 的所有 run.text"""
+    try:
+        from docx import Document
+        doc = Document(str(src_path))
+
+        def _conv_paragraphs(paragraphs):
+            for p in paragraphs:
+                for run in p.runs:
+                    if run.text:
+                        run.text = convert_fn(run.text)
+
+        _conv_paragraphs(doc.paragraphs)
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    _conv_paragraphs(cell.paragraphs)
+        for section in doc.sections:
+            _conv_paragraphs(section.header.paragraphs)
+            _conv_paragraphs(section.footer.paragraphs)
+            # 第一页头/尾（如果存在）
+            if section.different_first_page_header_footer:
+                _conv_paragraphs(section.first_page_header.paragraphs)
+                _conv_paragraphs(section.first_page_footer.paragraphs)
+
+        doc.save(str(dst_path))
+        return {"success": True, "error": None}
+    except ImportError:
+        return {"success": False, "error": "缺少 python-docx 库"}
+    except Exception as e:
+        return {"success": False, "error": f"docx 转换失败: {e}"}
+
+
+def _zh_convert_xlsx(src_path: Path, dst_path: Path, convert_fn) -> dict:
+    """xlsx 简繁转换：遍历所有 sheet 的每个 cell.value（仅字符串）"""
+    try:
+        from openpyxl import load_workbook
+        wb = load_workbook(str(src_path))
+        n_cells = 0
+        for ws in wb.worksheets:
+            for row in ws.iter_rows():
+                for cell in row:
+                    if isinstance(cell.value, str) and cell.value:
+                        cell.value = convert_fn(cell.value)
+                        n_cells += 1
+        wb.save(str(dst_path))
+        return {"success": True, "error": None, "cells_converted": n_cells}
+    except ImportError:
+        return {"success": False, "error": "缺少 openpyxl 库"}
+    except Exception as e:
+        return {"success": False, "error": f"xlsx 转换失败: {e}"}
+
+
+def _zh_convert_pptx(src_path: Path, dst_path: Path, convert_fn) -> dict:
+    """pptx 简繁转换：遍历所有 shapes 的 text_frame + 备注页"""
+    try:
+        from pptx import Presentation
+        prs = Presentation(str(src_path))
+        n_runs = 0
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if not shape.has_text_frame:
+                    continue
+                for para in shape.text_frame.paragraphs:
+                    for run in para.runs:
+                        if run.text:
+                            run.text = convert_fn(run.text)
+                            n_runs += 1
+            # 备注页
+            if slide.has_notes_slide:
+                notes_tf = slide.notes_slide.notes_text_frame
+                for para in notes_tf.paragraphs:
+                    for run in para.runs:
+                        if run.text:
+                            run.text = convert_fn(run.text)
+                            n_runs += 1
+        prs.save(str(dst_path))
+        return {"success": True, "error": None, "runs_converted": n_runs}
+    except ImportError:
+        return {"success": False, "error": "缺少 python-pptx 库"}
+    except Exception as e:
+        return {"success": False, "error": f"pptx 转换失败: {e}"}
+
+
+def _zh_preprocess_old_format(src_path: Path, work_dir: Path) -> dict:
+    """
+    对 .doc/.xls/.ppt 旧格式调用 LibreOffice 转为新格式。
+    返回 {"success": bool, "new_path": Path | None, "error": str | None}
+    """
+    ext = src_path.suffix.lower()
+    new_ext = _ZH_OLD_TO_NEW_EXT.get(ext)
+    if not new_ext:
+        return {"success": False, "new_path": None, "error": f"未知旧格式: {ext}"}
+
+    new_basename = src_path.stem + new_ext
+    expected = work_dir / new_basename
+
+    # 如果已存在同名文件先清掉
+    if expected.exists():
+        _cleanup(expected)
+
+    try:
+        result = subprocess.run(
+            [
+                'libreoffice', '--headless', '--norestore',
+                '--nofirststartwizard',
+                '--convert-to', new_ext[1:].upper(),  # docx / xlsx / pptx
+                '--outdir', str(work_dir),
+                str(src_path.resolve()),
+            ],
+            capture_output=True, text=True, timeout=300,
+        )
+    except subprocess.TimeoutExpired:
+        return {"success": False, "new_path": None, "error": "LibreOffice 预处理超时（>300s）"}
+    except FileNotFoundError:
+        return {"success": False, "new_path": None, "error": "系统中未找到 libreoffice 命令"}
+    except Exception as e:
+        return {"success": False, "new_path": None, "error": f"LibreOffice 调用失败: {e}"}
+
+    if expected.exists():
+        return {"success": True, "new_path": expected, "error": None}
+
+    # 兜底：扫一下目录里第一个匹配的新格式文件
+    candidates = list(work_dir.glob(f'*{new_ext}'))
+    if candidates:
+        return {"success": True, "new_path": candidates[0], "error": None}
+
+    return {
+        "success": False, "new_path": None,
+        "error": f"LibreOffice 未生成 {new_ext} 文件。stderr: {result.stderr[:200] if result.stderr else '(empty)'}",
+    }
+
+
+def convert_office_zh(src_path: Path, dst_path: Path, direction: str) -> dict:
+    """
+    Office 文档简繁转换总入口。
+    direction: 's2t' (简→繁) | 't2s' (繁→简)
+    旧格式 (.doc/.xls/.ppt) 先用 LibreOffice 转新格式，再做文本转换。
+    """
+    if direction not in _ZH_VALID_DIRECTIONS:
+        return {"success": False, "error": f"无效方向: {direction}"}
+
+    ext = src_path.suffix.lower()
+    if ext not in ALLOWED_EXT_OFFICE:
+        allowed = ', '.join(sorted(ALLOWED_EXT_OFFICE))
+        return {"success": False, "error": f"不支持的文件类型: {ext}，仅支持 {allowed}"}
+
+    try:
+        convert_fn = _get_zh_converter(direction).convert
+    except Exception as e:
+        return {"success": False, "error": f"OpenCC 初始化失败: {e}"}
+
+    # 旧格式：先 LibreOffice 转新格式（产物放在 OUTPUT_DIR）
+    work_src = src_path
+    converted_from_old = False
+    if ext in _ZH_OLD_TO_NEW_EXT:
+        os.chmod(src_path, 0o644)
+        pre = _zh_preprocess_old_format(src_path, dst_path.parent)
+        if not pre['success']:
+            return {"success": False, "error": pre['error']}
+        work_src = pre['new_path']
+        converted_from_old = True
+
+    # 实际新格式扩展名
+    new_ext = work_src.suffix.lower()
+
+    # 派发到具体转换器
+    if new_ext == '.docx':
+        result = _zh_convert_docx(work_src, dst_path, convert_fn)
+    elif new_ext == '.xlsx':
+        result = _zh_convert_xlsx(work_src, dst_path, convert_fn)
+    elif new_ext == '.pptx':
+        result = _zh_convert_pptx(work_src, dst_path, convert_fn)
+    else:
+        return {"success": False, "error": f"内部错误：未实现的扩展名 {new_ext}"}
+
+    # 清理 LibreOffice 中间产物（与 dst_path 同目录）
+    if converted_from_old and work_src.resolve() != dst_path.resolve():
+        _cleanup(work_src)
+
+    if not result['success']:
+        return result
+
+    # 把中间统计也带上
+    result['preprocessed'] = converted_from_old
+    return result
+
+
 # ── 通用下载响应 ──────────────────────────────────────────────
 
 def _make_download_response(dst_path, src_filename, new_ext, mime_type, src_path):
@@ -1371,6 +1591,11 @@ def pdf_encrypt_page():
 @app.route('/csv-excel')
 def csv_excel_page():
     return render_template('csv_excel.html')
+
+
+@app.route('/zh-convert')
+def zh_convert_page():
+    return render_template('zh_convert.html')
 
 
 # ── SEO 基础设施：sitemap.xml + robots.txt ──────────────
@@ -1877,6 +2102,86 @@ def api_excel_to_csv():
         _cleanup(src_path)
         _cleanup(dst_path)
         return jsonify(success=False, error=f'转换失败: {e}'), 500
+
+
+# ── API：Office 简繁转换 ─────────────────────────────
+
+@app.route('/api/convert/zh-convert', methods=['POST'])
+def api_zh_convert():
+    """Office 文档简繁转换。direction: s2t (简→繁) | t2s (繁→简)"""
+    if 'file' not in request.files:
+        return jsonify(success=False, error='未上传文件'), 400
+    file = request.files['file']
+    if not file or not file.filename:
+        return jsonify(success=False, error='文件名为空'), 400
+
+    direction = request.form.get('direction', '').strip().lower()
+    if direction not in _ZH_VALID_DIRECTIONS:
+        return jsonify(
+            success=False,
+            error=f'无效方向 "{direction}"，可选: {", ".join(_ZH_VALID_DIRECTIONS)}',
+        ), 400
+
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXT_OFFICE:
+        allowed = ', '.join(sorted(ALLOWED_EXT_OFFICE))
+        return jsonify(
+            success=False,
+            error=f'不支持的文件类型 "{ext}"，仅支持 {allowed}',
+        ), 400
+
+    uid = uuid.uuid4().hex
+    # 实际输出扩展名：旧格式会被转成新格式
+    actual_ext = _ZH_OLD_TO_NEW_EXT.get(ext, ext)
+    src_path = UPLOAD_DIR / f'{uid}{ext}'
+    dst_path = OUTPUT_DIR / f'{uid}{actual_ext}'
+    file.save(str(src_path))
+
+    try:
+        result = convert_office_zh(src_path, dst_path, direction)
+        if not result['success']:
+            _cleanup(src_path)
+            _cleanup(dst_path)
+            return jsonify(success=False, error=result['error']), 500
+
+        if not dst_path.exists() or dst_path.stat().st_size == 0:
+            _cleanup(src_path)
+            _cleanup(dst_path)
+            return jsonify(success=False, error='转换后文件为空'), 500
+
+        # MIME 映射
+        mime_map = {
+            '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        }
+        mime = mime_map.get(actual_ext, 'application/octet-stream')
+
+        # 下载名: 原文件_stem_方向.扩展名
+        # 例: 报告.docx + s2t → 报告_s2t.docx
+        #     报告.doc + s2t → 报告_s2t.docx （旧格式会自动转新格式）
+        original_stem = Path(file.filename).stem
+        suffix = _ZH_DIRECTION_SUFFIX[direction]
+        download_name = f'{original_stem}{suffix}{actual_ext}'
+
+        resp = send_file(
+            str(dst_path),
+            as_attachment=True,
+            download_name=download_name,
+            mimetype=mime,
+        )
+
+        @resp.call_on_close
+        def _cleanup_cb():
+            _cleanup(src_path)
+            _cleanup(dst_path)
+
+        return resp
+
+    except Exception as e:
+        _cleanup(src_path)
+        _cleanup(dst_path)
+        return jsonify(success=False, error=f'简繁转换失败: {e}'), 500
 
 
 # ── API：二维码生成 ─────────────────────────────

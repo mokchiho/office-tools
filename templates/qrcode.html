@@ -16,7 +16,10 @@
         {'name': '首页', 'url': '/'},
         {'name': seo_meta.qrcode.title.split(' - ')[0], 'url': seo_meta.qrcode.path}
     ]) }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tools.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/qrcode.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">

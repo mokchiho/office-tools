@@ -1,0 +1,210 @@
+/* ============================================
+   SEO 样式: 页脚、相关工具、FAQ
+   ============================================ */
+
+/* ── 相关工具区块 ── */
+.related-tools {
+    max-width: 800px;
+    margin: 48px auto 0;
+    padding: 24px;
+    background: var(--gray-50);
+    border-radius: 16px;
+}
+
+.related-tools h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.related-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.related-tool-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--gray-700);
+    transition: all 0.2s;
+}
+
+.related-tool-card:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+.related-tool-icon {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.related-tool-name {
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* ── FAQ 区块 ── */
+section.faq {
+    max-width: 800px;
+    margin: 32px auto 0;
+}
+
+section.faq > h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 16px;
+}
+
+section.faq .note {
+    margin: 0;
+}
+
+section.faq h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0 0 12px;
+}
+
+/* ── 页脚 ── */
+.site-footer {
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    margin-top: 60px;
+    padding: 48px 24px 24px;
+    color: var(--gray-700);
+    font-size: 14px;
+}
+
+.site-footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr repeat(4, 1fr);
+    gap: 32px;
+}
+
+.site-footer-col {
+    min-width: 0;
+}
+
+.site-footer-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+    margin: 0 0 12px;
+}
+
+.site-footer-desc {
+    color: var(--gray-600);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.site-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.site-footer-list li {
+    margin-bottom: 8px;
+}
+
+.site-footer-list a {
+    color: var(--gray-600);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.site-footer-list a:hover {
+    color: var(--primary);
+}
+
+.site-footer-bottom {
+    max-width: 1200px;
+    margin: 32px auto 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-200);
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 13px;
+}
+
+.site-footer-bottom a {
+    color: var(--gray-600);
+    text-decoration: none;
+}
+
+.site-footer-bottom a:hover {
+    color: var(--primary);
+}
+
+.site-footer-privacy {
+    margin: 8px 0 0;
+    color: var(--gray-500);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 900px) {
+    .site-footer-inner {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .related-tools-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .site-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .site-footer {
+        padding: 32px 16px 16px;
+    }
+    .related-tools-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* ── 夜间模式适配 ── */
+[data-theme="dark"] .site-footer {
+    background: var(--gray-100);
+    border-top-color: var(--gray-200);
+}
+
+[data-theme="dark"] .site-footer-list a,
+[data-theme="dark"] .site-footer-bottom a,
+[data-theme="dark"] .site-footer-bottom,
+[data-theme="dark"] .site-footer-privacy {
+    color: var(--gray-500);
+}
+
+[data-theme="dark"] .related-tools {
+    background: var(--gray-100);
+}
+
+[data-theme="dark"] .related-tool-card {
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+}
+
+[data-theme="dark"] .related-tool-card:hover {
+    background: var(--gray-200);
+}

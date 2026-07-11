@@ -56,25 +56,56 @@ def _update_task(task_id: str, **kwargs):
             t.update(kwargs)
 
 
-def get_task(task_id: str) -> Optional[dict]:
-    """获取 OCR 任务状态"""
+def get_task(task_id: str, access_token: str = None) -> Optional[dict]:
+    """获取 OCR 任务状态（需提供 access_token 鉴权）"""
     with _ocr_tasks_lock:
         t = _ocr_tasks.get(task_id)
         if t:
+            # 验证 access_token
+            if t.get('access_token') != access_token:
+                return None
             return dict(t)
-        return None
+    return None
 
 
-def remove_task(task_id: str):
-    """移除 OCR 任务"""
+def verify_task_access(task_id: str, access_token: str) -> Optional[dict]:
+    """验证 OCR 任务访问权限"""
+    with _ocr_tasks_lock:
+        t = _ocr_tasks.get(task_id)
+        if not t:
+            return None
+        if t.get('access_token') != access_token:
+            return None
+        return t
+
+
+def remove_task(task_id: str, access_token: str = None):
+    """移除 OCR 任务（需提供 access_token 鉴权）"""
+    with _ocr_tasks_lock:
+        t = _ocr_tasks.get(task_id)
+        if t:
+            # 验证 access_token
+            if t.get('access_token') != access_token:
+                return False
+            _ocr_tasks.pop(task_id, None)
+            return True
+    return False
+
+
+def _force_remove_task(task_id: str):
+    """强制移除 OCR 任务（不检查 token，用于内部清理）"""
     with _ocr_tasks_lock:
         _ocr_tasks.pop(task_id, None)
 
 
 def create_task(src_path: Path, dst_path: Path, src_filename: str) -> str:
-    """创建 OCR 任务并返回 task_id"""
+    """创建 OCR 任务并返回 (task_id, access_token)"""
     import uuid as _uuid
+    import secrets
+    
     task_id = _uuid.uuid4().hex
+    access_token = secrets.token_urlsafe(16)  # 128 位随机令牌
+    
     with _ocr_tasks_lock:
         _ocr_tasks[task_id] = {
             'status': 'pending',
@@ -85,12 +116,13 @@ def create_task(src_path: Path, dst_path: Path, src_filename: str) -> str:
             'src_path': src_path,
             'dst_path': dst_path,
             'src_filename': src_filename,
+            'access_token': access_token,
             'started_at': time.time(),
             'cancel': False,
         }
     _OCR_EXECUTOR.submit(_ocr_worker, task_id, src_path, dst_path)
     logger.info(f"OCR 任务已创建: {task_id}, 文件: {src_filename}")
-    return task_id
+    return task_id, access_token
 
 
 def cleanup_orphaned_tasks():
@@ -368,17 +400,17 @@ def _ocr_worker(task_id: str, src_path: Path, dst_path: Path):
                         next_tbl = next(tbl_iter, None)
                     line_strs = [_ocr_format_line(line) for line in para]
                     text = '\n'.join(line_strs)
-                    style, _ = _ocr_classify_paragraph(para, lines, p_idx, len(paragraphs))
-                    if style == 'Normal':
+                    para_style, _ = _ocr_classify_paragraph(para, lines, p_idx, len(paragraphs))
+                    if para_style == 'Normal':
                         doc.add_paragraph(text)
-                    elif style == 'List Bullet':
+                    elif para_style == 'List Bullet':
                         try:
                             doc.add_paragraph(text, style='List Bullet')
                         except KeyError:
                             doc.add_paragraph(text)
                     else:
                         try:
-                            doc.add_heading(text, level=1 if style == 'Heading 1' else 2)
+                            doc.add_heading(text, level=1 if para_style == 'Heading 1' else 2)
                         except Exception:
                             doc.add_paragraph(text)
                 while next_tbl:
@@ -401,6 +433,14 @@ def _ocr_worker(task_id: str, src_path: Path, dst_path: Path):
     except Exception as e:
         _update_task(task_id, status='failed', error=f'OCR 失败: {e}')
         logger.error(f"OCR 任务 {task_id} 失败: {e}")
+    finally:
+        # 任务完成后自动清理内存中的任务状态（保留 5 分钟供结果下载）
+        def _delayed_cleanup():
+            time.sleep(300)  # 5 分钟后清理
+            _force_remove_task(task_id)  # 强制清理，不检查 token
+            logger.debug(f"OCR 任务 {task_id} 已从内存中清理")
+        
+        threading.Thread(target=_delayed_cleanup, daemon=True).start()
 
 
 # ── 初始化：启动时清理过期任务 ──

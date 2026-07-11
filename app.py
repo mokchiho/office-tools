@@ -11,7 +11,6 @@ import time
 import shutil
 import subprocess
 import threading
-import concurrent.futures
 from pathlib import Path
 
 # ── 导入配置 ─────────────────────────────────────────────────────
@@ -25,12 +24,12 @@ from config import (
     OCR_MAX_FILE_BYTES, OCR_MAX_PAGES,
 )
 
-# ── 导入工具模块 ─────────────���───────────────────────────────────
+# ── 导入工具模块 ─────────────────────────────────────────────────────
 from utils.logging_config import get_logger, setup_logging
 from utils.cleanup import cleanup_startup, cleanup_scheduled
 from utils.rate_limit import init_limiter, RATE_LIMITS
-from utils.download import make_download_response, make_json_response
 from utils.cleanup import cleanup_file as _cleanup_file
+from utils.file_check import verify_uploaded_file
 
 # ── 初始化日志 ───────────────────────────────────────────────────
 logger = get_logger(__name__)
@@ -74,11 +73,6 @@ def inject_seo():
 # ── 目录初始化 ───────────────────────────────────────────────────
 UPLOAD_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
-
-# ── 后台定时清理 ─────────────────────────────────────────────────
-_CLEANUP_INTERVAL = 600  # 每10分钟
-_last_cleanup = time.time()
-_cleanup_lock = threading.Lock()
 
 
 def _periodic_cleanup():
@@ -134,8 +128,9 @@ def before_request():
 # ── 全局请求后清理钩子 ───────────────────────────────────────────
 @app.after_request
 def cleanup_after_request(response):
-    """全局：定时清理过期文件"""
+    """全局：定时清理过期文件和 OCR 任务状态"""
     _periodic_cleanup()
+    _cleanup_ocr_tasks_periodically()
     return response
 
 
@@ -716,7 +711,7 @@ def _make_download_response(dst_path, src_filename, new_ext, mime_type, src_path
 
 # ── 工具通用路由 ──────────────────────────────────────────────
 
-def _handle_convert(ext_set, convert_fn, new_ext, mime_type):
+def _handle_convert(ext_set, convert_fn, new_ext, mime_type, verify_signature: bool = True):
     """通用文件转换处理"""
     if 'file' not in request.files:
         return jsonify(success=False, error='未上传文件'), 400
@@ -729,6 +724,12 @@ def _handle_convert(ext_set, convert_fn, new_ext, mime_type):
     if ext not in ext_set:
         allowed = ', '.join(ext_set)
         return jsonify(success=False, error=f'不支持的文件类型 "{ext}"，仅支持 {allowed}'), 400
+
+    # 文件类型校验（Magic Bytes）
+    if verify_signature:
+        check = verify_uploaded_file(file, ext_set)
+        if not check['success']:
+            return jsonify(success=False, error=check['error']), 400
 
     uid = uuid.uuid4().hex
     src_path = UPLOAD_DIR / f'{uid}{ext}'
@@ -1858,13 +1859,13 @@ def api_zh_convert():
 
 
 # ── API：OCR 异步识别 ────────────────────────────────
-from services.ocr_service import (create_task, get_task, remove_task,
-                                   cleanup_orphaned_tasks, OCR_MAX_FILE_BYTES)
+from services.ocr_service import (create_task, get_task, verify_task_access,
+                                   remove_task, cleanup_orphaned_tasks, OCR_MAX_FILE_BYTES)
 
 
 @app.route('/api/ocr/start', methods=['POST'])
 def api_ocr_start():
-    """提交 OCR 任务，立即��回 task_id"""
+    """提交 OCR 任务，立即返回 task_id + access_token"""
     if 'file' not in request.files:
         return jsonify(success=False, error='未上传文件'), 400
     file = request.files['file']
@@ -1888,16 +1889,17 @@ def api_ocr_start():
     dst_path = OUTPUT_DIR / f'{uid}.docx'
     file.save(str(src_path))
 
-    task_id = create_task(src_path, dst_path, file.filename)
-    return jsonify(success=True, task_id=task_id)
+    task_id, access_token = create_task(src_path, dst_path, file.filename)
+    return jsonify(success=True, task_id=task_id, access_token=access_token)
 
 
 @app.route('/api/ocr/status/<task_id>')
 def api_ocr_status(task_id):
-    """轮询 OCR 任务状态"""
-    t = get_task(task_id)
+    """轮询 OCR 任务状态（需提供 access_token 鉴权）"""
+    access_token = request.args.get('access_token', '').strip()
+    t = verify_task_access(task_id, access_token)
     if not t:
-        return jsonify(success=False, error='任务不存在或已过期'), 404
+        return jsonify(success=False, error='任务不存在或无访问权限'), 404
     return jsonify(
         success=True,
         status=t['status'],
@@ -1910,10 +1912,11 @@ def api_ocr_status(task_id):
 
 @app.route('/api/ocr/download/<task_id>')
 def api_ocr_download(task_id):
-    """下载 OCR 结果"""
-    t = get_task(task_id)
+    """下载 OCR 结果（需提供 access_token 鉴权）"""
+    access_token = request.args.get('access_token', '').strip()
+    t = verify_task_access(task_id, access_token)
     if not t:
-        return jsonify(success=False, error='任务不存在'), 404
+        return jsonify(success=False, error='任务不存在或无访问权限'), 404
     if t['status'] != 'success':
         return jsonify(success=False, error='任务未完成或已失败'), 400
     dst_path = t['dst_path']
@@ -1929,12 +1932,13 @@ def api_ocr_download(task_id):
 
     src_path = t['src_path']
     tid = task_id
+    token = access_token
 
     @resp.call_on_close
     def _cleanup_on_close():
         _cleanup_file(src_path)
         _cleanup_file(dst_path)
-        remove_task(tid)
+        remove_task(tid, token)
 
     return resp
 
@@ -1943,10 +1947,28 @@ def api_ocr_download(task_id):
 # 初始化 & 应用入口
 # ═══════════════════════════════════════════════════════════════════
 
-# OCR 初始化
+# OCR 初始化 + 定期清理任务状态
 cleanup_orphaned_tasks()
 
 
+# OCR 任务状态定期清理线程（每 5 分钟执行）
+_ocr_cleanup_last_run = time.time()
+
+
+def _cleanup_ocr_tasks_periodically():
+    """定期清理过期的 OCR 任务状态"""
+    global _ocr_cleanup_last_run
+    now = time.time()
+    if now - _ocr_cleanup_last_run >= 300:  # 5 分钟
+        _ocr_cleanup_last_run = now
+        try:
+            cleanup_orphaned_tasks()
+            logger.debug("OCR 任务状态定期清理完成")
+        except Exception as e:
+            logger.error(f"OCR 任务状态清理失败: {e}")
+
+
+# 在每次请求后检查是否需要清理（更简单的方式）
 if __name__ == '__main__':
     logger.info("启动开发服务器...")
     app.run(host='0.0.0.0', port=5000, debug=True)

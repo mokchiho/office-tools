@@ -11,20 +11,20 @@ FILE_SIGNATURES = {
     # 图片
     '.jpg': ([b'\xff\xd8\xff'], 'image/jpeg'),
     '.jpeg': ([b'\xff\xd8\xff'], 'image/jpeg'),
-    '.png': ([b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'], 'image/png'),
-    '.gif': ([b'\x47\x49\x46\x38\x37\x61', b'\x47\x49\x46\x38\x39\x61'], 'image/gif'),
-    '.webp': ([b'RIFF', b'WEBP'], 'image/webp'),
-    '.bmp': ([b'\x42\x4d'], 'image/bmp'),
+    '.png': ([b'\x89PNG\r\n\x1a\n'], 'image/png'),
+    '.gif': ([b'GIF87a', b'GIF89a'], 'image/gif'),
+    '.webp': ([b'RIFF'], 'image/webp'),
+    '.bmp': ([b'BM'], 'image/bmp'),
     '.tiff': ([b'\x49\x49\x2a\x00', b'\x4d\x4d\x00\x2a'], 'image/tiff'),
     '.tif': ([b'\x49\x49\x2a\x00', b'\x4d\x4d\x00\x2a'], 'image/tiff'),
     # PDF
-    '.pdf': ([b'\x25\x50\x44\x46'], 'application/pdf'),
+    '.pdf': ([b'%PDF'], 'application/pdf'),
     # Office 文档 (ZIP 格式)
-    '.docx': ([b'\x50\x4b\x03\x04'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
-    '.xlsx': ([b'\x50\x4b\x03\x04'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-    '.pptx': ([b'\x50\x4b\x03\x04'], 'application/vnd.openxmlformats-officedocument.presentationml.presentation'),
-    '.odt': ([b'\x50\x4b\x03\x04'], 'application/vnd.oasis.opendocument.text'),
-    '.ods': ([b'\x50\x4b\x03\x04'], 'application/vnd.oasis.opendocument.spreadsheet'),
+    '.docx': ([b'PK\x03\x04'], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+    '.xlsx': ([b'PK\x03\x04'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+    '.pptx': ([b'PK\x03\x04'], 'application/vnd.openxmlformats-officedocument.presentationml.presentation'),
+    '.odt': ([b'PK\x03\x04'], 'application/vnd.oasis.opendocument.text'),
+    '.ods': ([b'PK\x03\x04'], 'application/vnd.oasis.opendocument.spreadsheet'),
     # 旧版 Office (MFC)
     '.doc': ([b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'], 'application/msword'),
     '.xls': ([b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'], 'application/vnd.ms-excel'),
@@ -33,8 +33,8 @@ FILE_SIGNATURES = {
     '.txt': (None, 'text/plain'),
     '.csv': (None, 'text/csv'),
     # 压缩文件
-    '.zip': ([b'\x50\x4b\x03\x04', b'\x50\x4b\x05\x06', b'\x50\x4b\x07\x08'], 'application/zip'),
-    '.rar': ([b'\x52\x61\x72\x21\x1a\x07'], 'application/x-rar-compressed'),
+    '.zip': ([b'PK\x03\x04', b'PK\x05\x06', b'PK\x07\x08'], 'application/zip'),
+    '.rar': ([b'Rar!\x1a\x07\x00'], 'application/x-rar-compressed'),
     '.7z': ([b'\x37\x7a\xbc\xaf\x27\x1c'], 'application/x-7z-compressed'),
 }
 

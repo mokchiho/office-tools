@@ -4,7 +4,13 @@
 import logging
 import sys
 from pathlib import Path
-from colorlog import ColoredFormatter
+
+try:
+    from colorlog import ColoredFormatter
+    _HAS_COLORLOG = True
+except ImportError:
+    _HAS_COLORLOG = False
+    ColoredFormatter = None
 
 # 项目根目录
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -17,13 +23,23 @@ LOG_DIR.mkdir(exist_ok=True)
 APP_LOG_FILE = LOG_DIR / 'app.log'
 ERROR_LOG_FILE = LOG_DIR / 'error.log'
 
+# 日志初始化标志
+_logging_initialized = False
+
 
 def setup_logging(log_level='INFO'):
     """
-    配置日志系统
+    配置日志系统（幂等调用）
     - 控制台输出：带颜色的简洁格式
     - 文件输出：详细格式 + 分离错误日志
     """
+    global _logging_initialized
+    
+    # 如果已经初始化，直接返回
+    if _logging_initialized:
+        return logging.getLogger()
+    
+    _logging_initialized = True
     # 移除默认 handlers
     root_logger = logging.getLogger()
     for handler in root_logger.handlers[:]:
@@ -36,16 +52,21 @@ def setup_logging(log_level='INFO'):
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(level)
     
-    console_formatter = ColoredFormatter(
-        '%(log_color)s[%(levelname)s]%(reset)s %(message)s',
-        log_colors={
-            'DEBUG':    'cyan',
-            'INFO':     'green',
-            'WARNING':  'yellow',
-            'ERROR':    'red',
-            'CRITICAL': 'red,bg_white',
-        }
-    )
+    if _HAS_COLORLOG:
+        console_formatter = ColoredFormatter(
+            '%(log_color)s[%(levelname)s]%(reset)s %(message)s',
+            log_colors={
+                'DEBUG':    'cyan',
+                'INFO':     'green',
+                'WARNING':  'yellow',
+                'ERROR':    'red',
+                'CRITICAL': 'red,bg_white',
+            }
+        )
+    else:
+        console_formatter = logging.Formatter(
+            '[%(levelname)s] %(message)s'
+        )
     console_handler.setFormatter(console_formatter)
     
     # ── 通用文件 Handler ──

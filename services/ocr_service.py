@@ -29,9 +29,8 @@ _OCR_EXECUTOR = concurrent.futures.ThreadPoolExecutor(
 _ocr_engine = None
 _ocr_engine_lock = threading.Lock()
 
-# 输入限制
-OCR_MAX_FILE_BYTES = 50 * 1024 * 1024  # 50MB
-OCR_MAX_PAGES = 100
+# 输入限制 - 从 config 导入
+from config import OCR_MAX_FILE_BYTES, OCR_MAX_PAGES
 
 
 def _get_ocr_engine():

@@ -63,11 +63,12 @@ else:
 # ── SEO 元数据注入 ───────────────────────────────────────────────
 @app.context_processor
 def inject_seo():
-    """向所有模板注入 site_url / site_name / seo_meta / 工具列表。"""
+    """向所有模板注入 site_url / site_name / seo_meta / 工具列表 / 当前年份。"""
     return {
         'site_url': SITE_URL,
         'site_name': SITE_NAME,
         'seo_meta': SEO_META,
+        'current_year': time.localtime().tm_year,
     }
 
 # ── 目录初始化 ───────────────────────────────────────────────────
@@ -114,23 +115,37 @@ def readiness():
 
 # ── 启动时清理 ───────────────────────────────────────────────────
 _initialized = False
+_cleanup_counter = 0  # 请求计数器，用于定期清理
+_CLEANUP_INTERVAL_REQUESTS = 10  # 每 10 次请求执行一次清理
 
 @app.before_request
 def before_request():
     """首次请求时执行初始化"""
-    global _initialized
+    global _initialized, _cleanup_counter
     if not _initialized:
         _initialized = True
         logger.info("应用首次启动，执行初始化...")
         cleanup_startup()
+    
+    # 增加清理计数器
+    _cleanup_counter += 1
 
 
-# ── 全局请求后清理钩子 ───────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════
+# 全局请求后清理钩子 ─────────────────────────────────────────────
+# 优化：每 N 次请求执行一次清理，而不是每次请求都执行
+# ═══════════════════════════════════════════════════════════════════
+
 @app.after_request
 def cleanup_after_request(response):
-    """全局：定时清理过期文件和 OCR 任务状态"""
-    _periodic_cleanup()
-    _cleanup_ocr_tasks_periodically()
+    """全局：定期清理过期文件（含 OCR 任务状态）"""
+    global _cleanup_counter
+    
+    # 每 10 次请求执行一次清理，而不是每次请求都执行
+    if _cleanup_counter >= _CLEANUP_INTERVAL_REQUESTS:
+        _cleanup_counter = 0
+        _periodic_cleanup()
+    
     return response
 
 
@@ -940,6 +955,14 @@ def api_pdf_merge():
                     _cleanup_file(sp)
                 return jsonify(success=False,
                                error=f'文件 "{f.filename}" 超过 {MAX_PDF_SIZE_BYTES // 1024 // 1024}MB 限制'), 400
+
+            # 验证文件魔数 (Magic Bytes)
+            f.seek(0)
+            header = f.read(4)
+            f.seek(0)
+            if not header.startswith(b'%PDF'):
+                return jsonify(success=False,
+                               error=f'文件 "{f.filename}" 不是有效的 PDF 文件'), 400
 
             sp = UPLOAD_DIR / f'{uid}_{i}{ext}'
             f.save(str(sp))
@@ -1947,28 +1970,13 @@ def api_ocr_download(task_id):
 # 初始化 & 应用入口
 # ═══════════════════════════════════════════════════════════════════
 
-# OCR 初始化 + 定期清理任务状态
+# OCR 初始化
 cleanup_orphaned_tasks()
 
+# OCR 任务状态定期清理并入 _periodic_cleanup 中的文件清理流程
+# 在 cleanup_after_request → _periodic_cleanup → cleanup_scheduled 中已包含
+# cleanup_orphaned_tasks 调用（见 utils/cleanup.py）
 
-# OCR 任务状态定期清理线程（每 5 分钟执行）
-_ocr_cleanup_last_run = time.time()
-
-
-def _cleanup_ocr_tasks_periodically():
-    """定期清理过期的 OCR 任务状态"""
-    global _ocr_cleanup_last_run
-    now = time.time()
-    if now - _ocr_cleanup_last_run >= 300:  # 5 分钟
-        _ocr_cleanup_last_run = now
-        try:
-            cleanup_orphaned_tasks()
-            logger.debug("OCR 任务状态定期清理完成")
-        except Exception as e:
-            logger.error(f"OCR 任务状态清理失败: {e}")
-
-
-# 在每次请求后检查是否需要清理（更简单的方式）
 if __name__ == '__main__':
     logger.info("启动开发服务器...")
     app.run(host='0.0.0.0', port=5000, debug=True)

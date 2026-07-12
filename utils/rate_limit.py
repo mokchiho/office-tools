@@ -4,8 +4,9 @@
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask import request
+import os
 
-from config import RATE_LIMIT_DEFAULT, RATE_LIMIT_UPLOAD
+from config import RATE_LIMIT_DEFAULT, RATE_LIMIT_UPLOAD, FLASK_ENV
 
 # 获取真实 IP（考虑代理）
 def get_real_ip():
@@ -29,11 +30,20 @@ def init_limiter(app):
     """
     初始化速率限制器
     """
+    # 生产环境使用 Redis，开发环境使用内存
+    if FLASK_ENV == 'production':
+        # Redis 连接配置
+        redis_url = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+        storage_uri = redis_url
+    else:
+        # 开发环境使用内存存储
+        storage_uri = "memory://"
+    
     limiter = Limiter(
         app=app,
         key_func=get_real_ip,  # 使用真实 IP 进行限流
         default_limits=[RATE_LIMIT_DEFAULT],
-        storage_uri="memory://",  # 生产环境应使用 Redis
+        storage_uri=storage_uri,
         strategy="fixed-window",
     )
     

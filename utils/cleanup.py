@@ -13,9 +13,16 @@ from utils.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-# 清理锁
+# 文件清理锁与定时
 _cleanup_lock = threading.Lock()
 _last_cleanup_time = time.time()
+
+# OCR 任务清理独立定时（与文件清理互不影响）
+_ocr_cleanup_lock = threading.Lock()
+_last_ocr_cleanup_time = time.time()
+
+# 默认 OCR 清理间隔（5分钟）
+OCR_CLEANUP_INTERVAL = 300
 
 
 def cleanup_file(path: Path) -> bool:
@@ -133,11 +140,29 @@ def cleanup_startup() -> dict:
     return {"deleted": deleted}
 
 
+def _cleanup_orphaned_ocr():
+    """清理过期的 OCR 任务状态（惰性节流）"""
+    global _last_ocr_cleanup_time
+    now = time.time()
+    with _ocr_cleanup_lock:
+        if now - _last_ocr_cleanup_time < OCR_CLEANUP_INTERVAL:  # 使用配置间隔
+            return
+        _last_ocr_cleanup_time = now
+    try:
+        from services.ocr_service import cleanup_orphaned_tasks as _cleanup_ocr
+        _cleanup_ocr()
+    except ImportError as e:
+        logger.debug(f"OCR 服务未安装，跳过清理: {e}")
+    except Exception as e:
+        logger.error(f"OCR 任务状态清理失败: {e}")
+
+
 def cleanup_scheduled():
     """定时清理任务（供 after_request 钩子调用）"""
     try:
         result = cleanup_expired_files()
         if result.get("deleted", 0) > 0:
             logger.debug(f"定时清理: {result}")
+        _cleanup_orphaned_ocr()
     except Exception as e:
         logger.error(f"定时清理失败: {e}")

@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page image-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">在 JPG / PNG / WebP / BMP / GIF / TIFF 格式之间自由转换。<br>
         <strong>支持透明通道处理，</strong>转换至不支持透明的格式时自动填充背景色。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 多格式支持</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="upload-zone" id="dropZone">
             <div class="upload-icon">📂</div>
@@ -176,8 +182,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');

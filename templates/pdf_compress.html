@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page pdf-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">通过<strong>图像降采样</strong>和<strong>流压缩</strong>减小 PDF 体积。<br>
         适用于扫描件、含大量图片的 PDF；纯文本 PDF 压缩效果有限。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 最大 200MB</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="upload-zone" id="dropZone">
             <div class="upload-icon">📂</div>
@@ -184,8 +190,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');

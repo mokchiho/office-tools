@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page pdf-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">从 PDF 中提取指定页面，<strong>合并为一个新 PDF 文件</strong>。<br>
         支持连续区间��如 <code>1-5</code>）和离散页码（如 <code>1,3,5</code>）混合使用。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 任意页数</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="upload-zone" id="dropZone">
             <div class="upload-icon">📂</div>
@@ -173,8 +179,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');

@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page image-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">将多张图片合并为一个 PDF 文件，<strong>每张图片一页</strong>。<br>
         支持 JPG / PNG / WebP / BMP / GIF / TIFF 格式，最多 10 张。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 最多10张</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="upload-zone" id="dropZone">
             <div class="upload-icon">📂</div>
@@ -152,8 +158,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');

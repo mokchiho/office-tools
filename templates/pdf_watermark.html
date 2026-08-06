@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page pdf-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">为 PDF 文件添加<strong>平铺文字水印</strong>，支持自定义字体大小、透明度和旋转角度。<br>
         适用于标记文档为"机密"、"草稿"或添加版权信息。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 最大 200MB</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="upload-zone" id="dropZone">
             <div class="upload-icon">📂</div>
@@ -189,8 +195,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');

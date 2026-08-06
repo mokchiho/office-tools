@@ -25,11 +25,38 @@
     <script src="{{ url_for('static', filename='common.js') }}"></script>
 </head>
 <body>
-<div class="container">
-    <a href="/" class="back-link">← 返回工具集</a>
-    <h1>📊 XLS 转 XLSX</h1>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">🛠</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">🔍</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">🌙</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page excel-page">
+        <a href="/" class="back-link">← 返回工具集</a>
+        <h1>
+            <div class="tool-icon excel">📊</div>
+            XLS 转 XLSX
+        </h1>
     <p class="page-desc">将 Excel 97-2003 (.xls) 文件转换为 Excel 2007+ (.xlsx) 格式。<br>
     转换基于 LibreOffice 引擎，<strong>完整保留内容、格式、图片、图表</strong>等所有元素。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 LibreOffice引擎</span>
+            <span class="trust-bar-item">📦 最大 500MB</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
     <div class="upload-zone" id="dropZone">
         <div class="upload-icon">📂</div>
@@ -132,8 +159,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 </div>
 
 <script>

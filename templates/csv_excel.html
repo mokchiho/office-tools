@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page excel-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc"><strong>CSV → Excel：</strong>解决 Excel 打开 CSV 乱码问题，自动检测编码。<br>
         <strong>Excel → CSV：</strong>将 Excel 工作表导出为 CSV，支持 UTF-8 编码。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 编码自动检测</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="mode-tabs">
             <button class="mode-tab active" data-mode="csv2excel">📥 CSV → Excel</button>
@@ -186,8 +192,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         const modeTabs = document.querySelectorAll('.mode-tab');
         const modeContents = document.querySelectorAll('.mode-content');

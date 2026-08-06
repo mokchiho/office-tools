@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page pdf-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">为 PDF 文件<strong>设置密码保护</strong>或<strong>解除密码限制</strong>。<br>
         加密后的 PDF 需要输入密码才能打开；解密后可移除密码限制。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 服务器端处理</span>
+            <span class="trust-bar-item">📦 最大 200MB</span>
+            <span class="trust-bar-item">⏱ 30分钟清理</span>
+        </div>
+
 
         <div class="mode-tabs">
             <button class="mode-tab active" data-mode="encrypt">🔐 加密 PDF</button>
@@ -205,8 +211,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         // Mode switching
         document.querySelectorAll('.mode-tab').forEach(tab => {

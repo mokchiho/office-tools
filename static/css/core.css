@@ -30,6 +30,37 @@
     --danger-500: #ef4444;
     --info-500: #06b6d4;
 
+    /* ── 工具类别色 ── */
+    --cat-pdf:        #ef4444;
+    --cat-pdf-light:  #fef2f2;
+    --cat-pdf-border: #fecaca;
+    --cat-pdf-bg:     #fee2e2;
+
+    --cat-excel:      #10b981;
+    --cat-excel-light:#ecfdf5;
+    --cat-excel-border:#a7f3d0;
+    --cat-excel-bg:   #d1fae5;
+
+    --cat-image:      #3b82f6;
+    --cat-image-light:#eff6ff;
+    --cat-image-border:#bfdbfe;
+    --cat-image-bg:   #dbeafe;
+
+    --cat-code:       #8b5cf6;
+    --cat-code-light: #f5f3ff;
+    --cat-code-border:#e9d5ff;
+    --cat-code-bg:    #f3e8ff;
+
+    --cat-security:   #6366f1;
+    --cat-security-light:#eef2ff;
+    --cat-security-border:#c7d2fe;
+    --cat-security-bg:#e0e7ff;
+
+    --cat-qr:         #f59e0b;
+    --cat-qr-light:   #fffbeb;
+    --cat-qr-border:  #fde68a;
+    --cat-qr-bg:      #fef3c7;
+
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -53,7 +84,6 @@
     --border-color: #e2e8f0;
     --border-focus: #3b82f6;
     --shadow-color: rgba(0, 0, 0, 0.1);
-    --decoration-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
 }
 
 /* ── 重置与基础 ── */
@@ -78,18 +108,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 500px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
-    z-index: -1;
-    opacity: 0.08;
-}
-
 /* ── 顶部导航 ── */
 .navbar {
     background: rgba(255, 255, 255, 0.95);
@@ -100,7 +118,7 @@ body::before {
     top: 0;
     z-index: 1000;
     padding: 0 24px;
-    height: 64px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -110,46 +128,43 @@ body::before {
 .navbar-brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
     color: var(--gray-900);
 }
 
 .navbar-brand-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
     color: white;
     box-shadow: var(--shadow-md);
 }
 
 .navbar-brand-text {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary-600), var(--accent-600));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--gray-900);
 }
 
 .navbar-search {
     flex: 1;
-    max-width: 480px;
-    margin: 0 40px;
+    max-width: 440px;
+    margin: 0 32px;
     position: relative;
 }
 
 .navbar-search input {
     width: 100%;
-    padding: 10px 16px 10px 44px;
+    padding: 9px 16px 9px 42px;
     font-size: 14px;
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-xl);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-lg);
     background: var(--gray-50);
     outline: none;
     transition: var(--transition-base);
@@ -158,27 +173,41 @@ body::before {
 .navbar-search input:focus {
     border-color: var(--primary-500);
     background: white;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .navbar-search-icon {
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray-400);
-    font-size: 16px;
+    font-size: 15px;
+}
+
+.navbar-search kbd {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    padding: 2px 6px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 4px;
+    color: var(--gray-400);
+    font-family: var(--font-sans);
 }
 
 .navbar-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
 .btn-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-md);
     border: none;
     background: var(--gray-100);
@@ -187,7 +216,7 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
     transition: var(--transition-fast);
 }
 
@@ -200,55 +229,77 @@ body::before {
 .tool-page {
     max-width: 800px;
     margin: 0 auto;
-    padding: 40px 24px;
+    padding: 32px 24px 48px;
 }
 
 .tool-page .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    color: var(--gray-600);
+    gap: 6px;
+    color: var(--gray-500);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
-    margin-bottom: 24px;
-    padding: 8px 16px;
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    padding: 6px 14px;
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
     transition: var(--transition-fast);
 }
 
 .tool-page .back-link:hover {
     color: var(--primary-600);
-    box-shadow: var(--shadow-md);
+    background: var(--primary-light);
 }
 
 .tool-page h1 {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 800;
     color: var(--gray-900);
     margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .tool-page h1 .tool-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
 .tool-page .page-desc {
     color: var(--gray-600);
-    font-size: 16px;
-    margin-bottom: 32px;
+    font-size: 15px;
+    margin-bottom: 8px;
     line-height: 1.7;
 }
 
-.tool-page .page-desc strong {
-    color: var(--primary-600);
+/* ── 信任提示条 ── */
+.trust-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 28px;
+    padding: 12px 16px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.trust-bar-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.trust-bar-item svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }
 
 /* ── 工具区块 ── */
@@ -257,7 +308,7 @@ body::before {
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     padding: 24px;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     box-shadow: var(--shadow-sm);
 }
 
@@ -354,12 +405,45 @@ body::before {
 }
 
 /* ── 工具图标颜色变体 ── */
-.tool-icon.pdf { background: linear-gradient(135deg, #fee2e2, #fecaca); }
-.tool-icon.excel { background: linear-gradient(135deg, #dcfce7, #bbf7d0); }
-.tool-icon.image { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
-.tool-icon.code { background: linear-gradient(135deg, #f3e8ff, #e9d5ff); }
-.tool-icon.tool { background: linear-gradient(135deg, #fef3c7, #fde68a); }
-.tool-icon.security { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); }
+.tool-icon.pdf {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #dc2626;
+}
+.tool-icon.excel {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #059669;
+}
+.tool-icon.image {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #2563eb;
+}
+.tool-icon.code {
+    background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+    color: #7c3aed;
+}
+.tool-icon.tool {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #d97706;
+}
+.tool-icon.security {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    color: #4f46e5;
+}
+
+/* ── 工具类别色条（详情页顶部） ── */
+.tool-page.pdf-page h1 { color: var(--cat-pdf); }
+.tool-page.excel-page h1 { color: var(--cat-excel); }
+.tool-page.image-page h1 { color: var(--cat-image); }
+.tool-page.code-page h1 { color: var(--cat-code); }
+.tool-page.security-page h1 { color: var(--cat-security); }
+.tool-page.qr-page h1 { color: var(--cat-qr); }
+
+.tool-page.pdf-page .back-link:hover { color: var(--cat-pdf); background: var(--cat-pdf-light); }
+.tool-page.excel-page .back-link:hover { color: var(--cat-excel); background: var(--cat-excel-light); }
+.tool-page.image-page .back-link:hover { color: var(--cat-image); background: var(--cat-image-light); }
+.tool-page.code-page .back-link:hover { color: var(--cat-code); background: var(--cat-code-light); }
+.tool-page.security-page .back-link:hover { color: var(--cat-security); background: var(--cat-security-light); }
+.tool-page.qr-page .back-link:hover { color: var(--cat-qr); background: var(--cat-qr-light); }
 
 /* ── 工具类 ── */
 .hidden { display: none !important; }
@@ -368,7 +452,7 @@ body::before {
 .container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 32px 24px;
+    padding: 24px 24px;
 }
 
 /* ── 动画 ── */
@@ -384,10 +468,11 @@ body::before {
 
 /* ── 响应式调整 ── */
 @media (max-width: 768px) {
-    .navbar { padding: 0 16px; }
+    .navbar { padding: 0 16px; height: 56px; }
     .navbar-search { display: none; }
-    .tool-page { padding: 24px 16px; }
-    .tool-page h1 { font-size: 24px; }
+    .tool-page { padding: 20px 16px 40px; }
+    .tool-page h1 { font-size: 22px; }
+    .trust-bar { gap: 8px; font-size: 12px; }
 }
 
 /* ════════════════════════════════════════
@@ -407,17 +492,38 @@ body::before {
     --border-color: #3f3f3f;
     --border-focus: #60a5fa;
     --shadow-color: rgba(0, 0, 0, 0.3);
-    --decoration-gradient: linear-gradient(135deg, #1e3a5f 0%, #2d1b4e 50%, #1e3a5f 100%);
     --primary-500: #60a5fa;
     --primary-600: #3b82f6;
     --primary-700: #2563eb;
     --accent-500: #a78bfa;
     --accent-600: #8b5cf6;
-}
-
-[data-theme="dark"] body::before {
-    background: var(--decoration-gradient);
-    opacity: 0.15;
+    --gray-100: #1f2937;
+    --gray-200: #374151;
+    --gray-300: #4b5563;
+    --gray-400: #6b7280;
+    --gray-500: #9ca3af;
+    --gray-600: #d1d5db;
+    --gray-700: #e5e7eb;
+    --gray-800: #f3f4f6;
+    --gray-900: #f9fafb;
+    --cat-pdf-light: #451a1a;
+    --cat-pdf-border: #991b1b;
+    --cat-pdf-bg: #7f1d1d;
+    --cat-excel-light: #064e3b;
+    --cat-excel-border: #065f46;
+    --cat-excel-bg: #064e3b;
+    --cat-image-light: #1e3a8a;
+    --cat-image-border: #1e40af;
+    --cat-image-bg: #1e3a8a;
+    --cat-code-light: #3b0764;
+    --cat-code-border: #4c1d95;
+    --cat-code-bg: #3b0764;
+    --cat-security-light: #2e1065;
+    --cat-security-border: #3730a3;
+    --cat-security-bg: #2e1065;
+    --cat-qr-light: #78350f;
+    --cat-qr-border: #92400e;
+    --cat-qr-bg: #78350f;
 }
 
 [data-theme="dark"] .navbar {
@@ -462,7 +568,7 @@ body::before {
 }
 
 [data-theme="dark"] .tool-page .back-link {
-    background: var(--bg-card);
+    background: #2a2a2a;
     color: var(--text-secondary);
 }
 
@@ -472,4 +578,10 @@ body::before {
 
 [data-theme="dark"] .tool-page h1 {
     color: var(--text-primary);
+}
+
+[data-theme="dark"] .trust-bar {
+    background: #1a1a1a;
+    border-color: var(--border-color);
+    color: var(--text-secondary);
 }

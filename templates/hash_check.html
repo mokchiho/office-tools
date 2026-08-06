@@ -43,7 +43,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page code-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -52,6 +52,12 @@
         </h1>
         <p class="page-desc">计算文件的 <strong>MD5 / SHA1 / SHA256 / SHA512</strong> 哈希值，验证文件完整性。<br>
         全部在浏览器本地计算，<strong>文件不上传服务器</strong>，保护您的数据隐私。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 浏览器本地计算</span>
+            <span class="trust-bar-item">📦 不上传服务器</span>
+            <span class="trust-bar-item">⏱ 即时完成</span>
+        </div>
+
 
         <div class="tool-section">
             <div class="input-group">
@@ -185,8 +191,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
         // 简化 MD5 实现
         const md5 = {

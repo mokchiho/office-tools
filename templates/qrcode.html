@@ -44,7 +44,7 @@
     </nav>
 
     <!-- 工具页面 -->
-    <div class="tool-page">
+    <div class="tool-page qr-page">
         <a href="/" class="back-link">← 返回工具集</a>
         
         <h1>
@@ -53,6 +53,12 @@
         </h1>
         <p class="page-desc">生成可下载的二维码图片，支持 <strong>文本/网址/WiFi/邮箱/电话/短信</strong> 等多种类型。<br>
         支持自定义颜色和纠错级别，可下载 <strong>PNG</strong>（位图）和 <strong>SVG</strong>（矢量）格式。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">🔒 即时生成</span>
+            <span class="trust-bar-item">📦 PNG/SVG下载</span>
+            <span class="trust-bar-item">⏱ 不保存数据</span>
+        </div>
+
 
         <div class="type-tabs">
             <button class="type-tab active" data-type="text">📝 文本</button>
@@ -271,8 +277,6 @@
         </a>
     </div>
 </section>
-        
-            </section>
 <script>
     (function() {
         let lastPngUrl = null;

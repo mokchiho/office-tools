@@ -860,6 +860,21 @@ def zh_convert_page():
     return render_template('zh_convert.html')
 
 
+@app.route('/password-generator')
+def password_generator_page():
+    return render_template('password_generator.html')
+
+
+@app.route('/url-encode')
+def url_encode_page():
+    return render_template('url_encode.html')
+
+
+@app.route('/uuid-generator')
+def uuid_generator_page():
+    return render_template('uuid_generator.html')
+
+
 # ═══════════════════════════════════════════════════════════════════
 # SEO 基础设施：sitemap.xml + robots.txt
 # ═══════════════════════════════════════════════════════════════════

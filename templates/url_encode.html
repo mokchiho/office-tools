@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.url_encode.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
+    {{ seo_macros.head(
+        title=seo_meta.url_encode.title,
+        description=seo_meta.url_encode.description,
+        keywords=seo_meta.url_encode.keywords,
+        path=seo_meta.url_encode.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.url_encode.title.split(' - ')[0], 'url': seo_meta.url_encode.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tools.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seo.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page code-page">
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon code">{{ icon('link', 22) }}</div>
+            URL 编解码
+        </h1>
+        <p class="page-desc">URL 编码与解码，支持 <strong>encodeURIComponent</strong> 和 <strong>encodeURI</strong> 两种模式。<br>
+        自动处理中文和特殊字符，全部在浏览器本地完成，<strong>不经过服务器</strong>。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 实时转换</span>
+        </div>
+
+        <div class="tool-section">
+            <div class="tool-tabs">
+                <button class="tool-tab active" data-tab="encode">{{ icon('lock', 15) }} 编码</button>
+                <button class="tool-tab" data-tab="decode">{{ icon('unlock', 15) }} 解码</button>
+            </div>
+
+            <!-- 编码 Tab -->
+            <div id="tab-encode" class="tab-content active">
+                <div class="input-group">
+                    <label class="input-label">输入原始文本</label>
+                    <textarea id="encodeInput" class="tool-textarea" rows="4" placeholder="输入要编码的文本或 URL，如：https://example.com/搜索?q=你好世界"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">编码模式</label>
+                    <div class="algo-selector">
+                        <label class="algo-option">
+                            <input type="radio" name="encodeMode" value="component" checked>
+                            <div>
+                                <strong>encodeURIComponent</strong>
+                                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">编码所有特殊字符（:/?=等），适合 URL 参数值</div>
+                            </div>
+                        </label>
+                        <label class="algo-option">
+                            <input type="radio" name="encodeMode" value="uri">
+                            <div>
+                                <strong>encodeURI</strong>
+                                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">保留 URL 结构字符（:/?#[]@等），适合完整 URL</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button id="encodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">编码</button>
+                    <button id="encodeClear" class="btn-sm">清空</button>
+                </div>
+
+                <div class="input-group" style="margin-top:16px;">
+                    <label class="input-label">编码结果</label>
+                    <textarea id="encodeOutput" class="tool-textarea output-success" rows="4" readonly placeholder="编码结果..." onclick="this.select()"></textarea>
+                    <div class="btn-row">
+                        <button id="encodeCopy" class="btn-sm">{{ icon('clipboard', 14) }} 复制结果</button>
+                        <span id="encodeStats" style="font-size:13px;color:#64748b;line-height:40px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 解码 Tab -->
+            <div id="tab-decode" class="tab-content">
+                <div class="input-group">
+                    <label class="input-label">输入编码后的文本</label>
+                    <textarea id="decodeInput" class="tool-textarea" rows="4" placeholder="输入 URL 编码文本，如：https%3A%2F%2Fexample.com%2F%E6%90%9C%E7%B4%A2"></textarea>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">解码模式</label>
+                    <div class="algo-selector">
+                        <label class="algo-option">
+                            <input type="radio" name="decodeMode" value="component" checked>
+                            <div>
+                                <strong>decodeURIComponent</strong>
+                                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">解码所有 %XX 序列，适合 URL 参数值</div>
+                            </div>
+                        </label>
+                        <label class="algo-option">
+                            <input type="radio" name="decodeMode" value="uri">
+                            <div>
+                                <strong>decodeURI</strong>
+                                <div style="font-size:12px;color:var(--gray-400);margin-top:2px;">保留 URL 结构字符不解码，适合完整 URL</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button id="decodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">解码</button>
+                    <button id="decodeClear" class="btn-sm">清空</button>
+                </div>
+
+                <div class="input-group" style="margin-top:16px;">
+                    <label class="input-label">解码结果</label>
+                    <textarea id="decodeOutput" class="tool-textarea output-success" rows="4" readonly placeholder="解码结果..." onclick="this.select()"></textarea>
+                    <div class="btn-row">
+                        <button id="decodeCopy" class="btn-sm">{{ icon('clipboard', 14) }} 复制结果</button>
+                        <span id="decodeError" class="tool-error-msg" style="font-size:13px;line-height:40px;color:#ef4444;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="faq">
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li><strong>encodeURIComponent</strong>：编码所有特殊字符（包括 <code>:/?&=</code> 等），适合编码 URL 参数值</li>
+                <li><strong>encodeURI</strong>：保留 URL 结构字符不变，只编码中文和空格等，适合编码完整 URL</li>
+                <li>中文会被编码为 <code>%XX</code> 格式（UTF-8 字节的百分号编码）</li>
+                <li>所有处理在浏览器本地完成，<strong>数据不上传服务器</strong></li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "encodeURIComponent 和 encodeURI 有什么区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "encodeURIComponent 会编码所有特殊字符（包括 :/?#[]@!$&'()*+,;= 等），适合编码 URL 参数值。encodeURI 保留 URL 结构字符（:/?#[]@ 等），只编码中文、空格等非 URL 字符，适合编码完整 URL 地址。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "支持中文编码吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "支持。中文字符会按 UTF-8 编码后转为百分号编码形式，如「你好」编码为 %E4%BD%A0%E5%A5%BD。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "数据会上传服务器吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不会。所有编码解码完全在浏览器本地完成，数据不会离开您的设备。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "什么时候应该用 URL 编码?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "当需要在 URL 中传递中文、空格或特殊字符时必须进行 URL 编码。例如在 URL 参数中传递搜索关键词、在链接中包含中文路径等场景。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+        <a href="/json-tool" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
+            <span class="related-tool-name">JSON 格式化</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+        <a href="/uuid-generator" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('fingerprint', 24) }}</span>
+            <span class="related-tool-name">UUID 生成器</span>
+        </a>
+    </div>
+</section>
+<script>
+(function() {
+    // Tab 切换
+    document.querySelectorAll('.tool-tab').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tool-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+            tab.classList.add('active');
+            document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+    });
+
+    // ── 编码 ──
+    var encodeInput = document.getElementById('encodeInput');
+    var encodeOutput = document.getElementById('encodeOutput');
+    var encodeStats = document.getElementById('encodeStats');
+    var encodeTimer;
+
+    function doEncode() {
+        var text = encodeInput.value;
+        if (!text) { encodeOutput.value = ''; encodeStats.textContent = ''; return; }
+        try {
+            var mode = document.querySelector('input[name="encodeMode"]:checked').value;
+            var result = mode === 'component' ? encodeURIComponent(text) : encodeURI(text);
+            encodeOutput.value = result;
+            var ratio = text.length > 0 ? ((result.length / text.length) * 100).toFixed(1) : '0';
+            encodeStats.textContent = '原文 ' + text.length + ' 字符 → 编码后 ' + result.length + ' 字符 (' + ratio + '%)';
+        } catch (e) {
+            encodeOutput.value = '编码失败: ' + e.message;
+            encodeStats.textContent = '';
+        }
+    }
+
+    encodeInput.addEventListener('input', function() {
+        clearTimeout(encodeTimer);
+        encodeTimer = setTimeout(doEncode, 300);
+    });
+    document.querySelectorAll('input[name="encodeMode"]').forEach(function(r) {
+        r.addEventListener('change', doEncode);
+    });
+    document.getElementById('encodeBtn').addEventListener('click', doEncode);
+
+    document.getElementById('encodeClear').addEventListener('click', function() {
+        encodeInput.value = '';
+        encodeOutput.value = '';
+        encodeStats.textContent = '';
+        encodeInput.focus();
+    });
+
+    document.getElementById('encodeCopy').addEventListener('click', function() {
+        if (!encodeOutput.value) return;
+        var btn = this;
+        navigator.clipboard.writeText(encodeOutput.value).then(function() {
+            btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+            setTimeout(function() { btn.innerHTML = window.toolIcon('clipboard') + ' 复制结果'; }, 1500);
+        });
+    });
+
+    // ── 解码 ──
+    var decodeInput = document.getElementById('decodeInput');
+    var decodeOutput = document.getElementById('decodeOutput');
+    var decodeError = document.getElementById('decodeError');
+    var decodeTimer;
+
+    function doDecode() {
+        var text = decodeInput.value.trim();
+        if (!text) { decodeOutput.value = ''; decodeError.textContent = ''; return; }
+        try {
+            var mode = document.querySelector('input[name="decodeMode"]:checked').value;
+            var result = mode === 'component' ? decodeURIComponent(text) : decodeURI(text);
+            decodeOutput.value = result;
+            decodeError.textContent = '';
+        } catch (e) {
+            decodeOutput.value = '';
+            decodeError.textContent = '解码失败: ' + e.message;
+        }
+    }
+
+    decodeInput.addEventListener('input', function() {
+        clearTimeout(decodeTimer);
+        decodeTimer = setTimeout(doDecode, 300);
+    });
+    document.querySelectorAll('input[name="decodeMode"]').forEach(function(r) {
+        r.addEventListener('change', doDecode);
+    });
+    document.getElementById('decodeBtn').addEventListener('click', doDecode);
+
+    document.getElementById('decodeClear').addEventListener('click', function() {
+        decodeInput.value = '';
+        decodeOutput.value = '';
+        decodeError.textContent = '';
+        decodeInput.focus();
+    });
+
+    document.getElementById('decodeCopy').addEventListener('click', function() {
+        if (!decodeOutput.value) return;
+        var btn = this;
+        navigator.clipboard.writeText(decodeOutput.value).then(function() {
+            btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+            setTimeout(function() { btn.innerHTML = window.toolIcon('clipboard') + ' 复制结果'; }, 1500);
+        });
+    });
+})();
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

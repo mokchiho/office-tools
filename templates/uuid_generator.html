@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ seo_meta.uuid_generator.title }}</title>
+    {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
+    {{ seo_macros.head(
+        title=seo_meta.uuid_generator.title,
+        description=seo_meta.uuid_generator.description,
+        keywords=seo_meta.uuid_generator.keywords,
+        path=seo_meta.uuid_generator.path,
+        jsonld_type='WebApplication'
+    ) }}
+    {{ seo_macros.breadcrumb([
+        {'name': '首页', 'url': '/'},
+        {'name': seo_meta.uuid_generator.title.split(' - ')[0], 'url': seo_meta.uuid_generator.path}
+    ]) }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tools.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seo.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
+    <style>
+        /* ── UUID 展示区 ── */
+        .uuid-display {
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+        .uuid-display:hover { border-color: var(--primary-400); }
+        .uuid-main {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-800);
+            letter-spacing: 1px;
+            word-break: break-all;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            user-select: all;
+        }
+        .uuid-main.empty {
+            color: var(--gray-400);
+            font-weight: 400;
+        }
+        .uuid-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ── 格式选项 ── */
+        .format-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            user-select: none;
+        }
+        .format-option:hover {
+            border-color: var(--primary-400);
+            background: var(--bg-card-hover);
+        }
+        .format-option:has(input:checked) {
+            border-color: var(--primary-500);
+            background: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .format-option input[type="radio"] { display: none; }
+        .format-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        .format-sample {
+            font-size: 12px;
+            color: var(--gray-400);
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        /* ── 批量结果 ── */
+        .uuid-list {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            margin-top: 16px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+        .uuid-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-md);
+            margin-bottom: 6px;
+            transition: var(--transition-fast);
+        }
+        .uuid-item:last-child { margin-bottom: 0; }
+        .uuid-item:hover { border-color: var(--primary-300); }
+        .uuid-item-index {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+        }
+        .uuid-item-text {
+            flex: 1;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            color: var(--gray-800);
+            word-break: break-all;
+            letter-spacing: 0.3px;
+        }
+        .uuid-item-copy {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            background: white;
+            color: var(--gray-500);
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .uuid-item-copy:hover {
+            background: var(--primary-500);
+            color: white;
+            border-color: var(--primary-500);
+        }
+        .uuid-item-copy.copied {
+            background: var(--success-500);
+            color: white;
+            border-color: var(--success-500);
+        }
+
+        /* ── 夜间模式 ── */
+        [data-theme="dark"] .uuid-display {
+            background: #2a2a2a;
+            border-color: var(--border-color);
+        }
+        [data-theme="dark"] .uuid-main { color: #e5e5e5; }
+        [data-theme="dark"] .format-option {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        [data-theme="dark"] .format-option:hover { background: var(--bg-card-hover); }
+        [data-theme="dark"] .format-option:has(input:checked) {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--primary-500);
+        }
+        [data-theme="dark"] .format-name { color: var(--text-primary); }
+        [data-theme="dark"] .uuid-list {
+            background: #1a1a1a;
+            border-color: var(--border-color);
+        }
+        [data-theme="dark"] .uuid-item {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        [data-theme="dark"] .uuid-item-text { color: var(--text-primary); }
+        [data-theme="dark"] .uuid-item-copy {
+            background: #333;
+            border-color: var(--border-color);
+            color: #aaa;
+        }
+        [data-theme="dark"] .uuid-item-copy:hover {
+            background: var(--primary-500);
+            color: white;
+            border-color: var(--primary-500);
+        }
+
+        @media (max-width: 768px) {
+            .format-grid { grid-template-columns: 1fr; }
+            .uuid-main { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
+            <span class="navbar-brand-text">办公工具集</span>
+        </a>
+        
+        <div class="navbar-search">
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
+            <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
+        </div>
+        
+        <div class="navbar-actions">
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
+        </div>
+    </nav>
+
+    <!-- 工具页面 -->
+    <div class="tool-page code-page">
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
+        
+        <h1>
+            <div class="tool-icon code">{{ icon('fingerprint', 22) }}</div>
+            UUID 生成器
+        </h1>
+        <p class="page-desc">批量生成 UUID (Universally Unique Identifier)，支持自定义格式。<br>
+        基于 <strong>Web Crypto API</strong> 在浏览器本地生成，<strong>不上传服务器</strong>。</p>
+        <div class="trust-bar">
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地生成</span>
+            <span class="trust-bar-item">{{ icon('zap', 14) }} 加密级随机数</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+        </div>
+
+        <div class="tool-section">
+            <!-- UUID 主展示 -->
+            <div class="uuid-display">
+                <div class="uuid-main empty" id="uuidMain">点击下方按钮生成 UUID</div>
+                <div class="uuid-actions">
+                    <button class="btn-sm" id="copyMainBtn">{{ icon('clipboard', 14) }} 复制</button>
+                    <button class="btn-sm" id="copyAllBtn">{{ icon('clipboard', 14) }} 复制全部</button>
+                </div>
+            </div>
+
+            <!-- 生成数量 -->
+            <div class="slider-group">
+                <div class="slider-label">
+                    <span>生成数量</span>
+                    <span class="slider-value" id="countValue">5</span>
+                </div>
+                <input type="range" id="countSlider" min="1" max="50" value="5" step="1">
+            </div>
+
+            <!-- 格式选择 -->
+            <label class="input-label" style="margin-bottom:10px;">输出格式</label>
+            <div class="format-grid">
+                <label class="format-option">
+                    <input type="radio" name="uuidFormat" value="lower" checked>
+                    <div>
+                        <div class="format-name">小写 + 连字符</div>
+                        <div class="format-sample">xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx</div>
+                    </div>
+                </label>
+                <label class="format-option">
+                    <input type="radio" name="uuidFormat" value="upper">
+                    <div>
+                        <div class="format-name">大写 + 连字符</div>
+                        <div class="format-sample">XXXXXXXX-XXXX-4XXX-YXXX-XXXXXXXXXXXX</div>
+                    </div>
+                </label>
+                <label class="format-option">
+                    <input type="radio" name="uuidFormat" value="nohyphen">
+                    <div>
+                        <div class="format-name">小写无连字符</div>
+                        <div class="format-sample">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+                    </div>
+                </label>
+                <label class="format-option">
+                    <input type="radio" name="uuidFormat" value="braces">
+                    <div>
+                        <div class="format-name">花括号包裹</div>
+                        <div class="format-sample">{xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx}</div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- 生成按钮 -->
+            <button class="generate-btn" id="generateBtn" style="
+                width:100%; padding:16px; font-size:16px; font-weight:700;
+                border:none; border-radius:var(--radius-lg);
+                background:linear-gradient(135deg, var(--primary-500), var(--accent-500));
+                color:white; cursor:pointer; transition:var(--transition-fast);
+                box-shadow:0 4px 14px rgba(59,130,246,0.35);
+                display:flex; align-items:center; justify-content:center; gap:8px;
+            ">
+                生成 UUID
+            </button>
+
+            <!-- 结果列表 -->
+            <div class="uuid-list hidden" id="uuidList"></div>
+        </div>
+
+        <section class="faq">
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
+            <div class="note">
+            <h3>使用说明</h3>
+            <ul>
+                <li>生成 UUID v4（基于随机数），符合 RFC 4122 标准</li>
+                <li>使用 <strong>crypto.getRandomValues()</strong> 加密级随机数，确保唯一性</li>
+                <li>UUID 碰撞概率极低（约 2⁻¹²²），可放心用作唯一标识符</li>
+                <li>支持 4 种输出格式：小写/大写/无连字符/花括号</li>
+                <li>所有生成在浏览器本地完成，<strong>UUID 不会上传服务器</strong></li>
+            </ul>
+        </div>
+            </section>
+
+            <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "什么是 UUID?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "UUID (Universally Unique Identifier) 是 128 位的唯一标识符,通常表示为 32 个十六进制字符加 4 个连字符(共 36 字符)。UUID v4 基于随机数生成,碰撞概率极低,广泛用于数据库主键、会话ID、文件名等场景。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "UUID v4 是什么?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "UUID v4 是基于随机数生成的 UUID 版本。它将版本号设为 4(第 13 位十六进制字符),变体位设为 10(第 17 位高位),其余位为随机值。本工具使用 Web Crypto API 的加密级随机数生成,符合 RFC 4122 标准。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "UUID 会重复吗?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "理论上可能但概率极低。生成 10 亿个 UUID v4 后出现重复的概率约为 0.00000000006%。在实际应用中可以认为 UUID 是唯一的。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "UUID 和 GUID 有什么区别?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "GUID 是 Microsoft 对 UUID 的实现,两者本质相同。GUID 通常指 Microsoft 体系中的 UUID,格式一致。本工具生成的 UUID 也等同于 GUID。"
+          }
+        }
+  ]
+}
+</script>
+
+            <section class="related-tools" aria-label="相关工具">
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
+    <div class="related-tools-grid">
+        <a href="/password-generator" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('key-round', 24) }}</span>
+            <span class="related-tool-name">密码生成器</span>
+        </a>
+        <a href="/url-encode" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('link', 24) }}</span>
+            <span class="related-tool-name">URL 编解码</span>
+        </a>
+        <a href="/base64" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
+            <span class="related-tool-name">Base64 编解码</span>
+        </a>
+        <a href="/timestamp" class="related-tool-card">
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
+            <span class="related-tool-name">时间戳转换</span>
+        </a>
+    </div>
+</section>
+<script>
+(function() {
+    // ── DOM 元素 ──
+    var uuidMain = document.getElementById('uuidMain');
+    var countSlider = document.getElementById('countSlider');
+    var countValue = document.getElementById('countValue');
+    var generateBtn = document.getElementById('generateBtn');
+    var uuidList = document.getElementById('uuidList');
+    var copyMainBtn = document.getElementById('copyMainBtn');
+    var copyAllBtn = document.getElementById('copyAllBtn');
+
+    var currentUUIDs = [];
+
+    // ── 滑块 ──
+    countSlider.addEventListener('input', function() {
+        countValue.textContent = this.value;
+    });
+
+    // ── 生成 UUID v4 ──
+    function generateUUIDv4() {
+        // 使用 crypto.randomUUID() 如果可用，否则手动生成
+        if (typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        }
+        // 手动 fallback：基于 crypto.getRandomValues
+        var bytes = new Uint8Array(16);
+        crypto.getRandomValues(bytes);
+        // 版本位：第 6 字节高 4 位设为 4 (0100)
+        bytes[6] = (bytes[6] & 0x0f) | 0x40;
+        // 变体位：第 8 字节高 2 位设为 10
+        bytes[8] = (bytes[8] & 0x3f) | 0x80;
+        var hex = [];
+        for (var i = 0; i < 16; i++) {
+            hex.push(bytes[i].toString(16).padStart(2, '0'));
+        }
+        return hex[0]+hex[1]+'-'+hex[2]+'-'+hex[3]+'-'+hex[4]+'-'+hex[5]+hex[6]+hex[7]+hex[8];
+    }
+
+    // ── 格式化 UUID ──
+    function formatUUID(uuid) {
+        var format = document.querySelector('input[name="uuidFormat"]:checked').value;
+        switch (format) {
+            case 'upper':
+                return uuid.toUpperCase();
+            case 'nohyphen':
+                return uuid.replace(/-/g, '');
+            case 'braces':
+                return '{' + uuid + '}';
+            default:
+                return uuid.toLowerCase();
+        }
+    }
+
+    // ── 生成 ──
+    function generate() {
+        var count = parseInt(countSlider.value, 10);
+        currentUUIDs = [];
+
+        for (var i = 0; i < count; i++) {
+            var raw = generateUUIDv4();
+            currentUUIDs.push(formatUUID(raw));
+        }
+
+        // 显示第一个
+        if (currentUUIDs.length > 0) {
+            uuidMain.textContent = currentUUIDs[0];
+            uuidMain.classList.remove('empty');
+        }
+
+        // 批量列表
+        if (count > 1) {
+            uuidList.classList.remove('hidden');
+            var html = '';
+            for (var j = 0; j < currentUUIDs.length; j++) {
+                html += '<div class="uuid-item">' +
+                    '<span class="uuid-item-index">' + (j + 1) + '</span>' +
+                    '<span class="uuid-item-text">' + currentUUIDs[j] + '</span>' +
+                    '<button class="uuid-item-copy" data-index="' + j + '">复制</button>' +
+                    '</div>';
+            }
+            uuidList.innerHTML = html;
+
+            uuidList.querySelectorAll('.uuid-item-copy').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var idx = parseInt(this.dataset.index, 10);
+                    copyText(currentUUIDs[idx], this);
+                });
+            });
+        } else {
+            uuidList.classList.add('hidden');
+            uuidList.innerHTML = '';
+        }
+    }
+
+    // ── 复制 ──
+    function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(function() {
+            if (btn) {
+                var orig = btn.innerHTML;
+                btn.innerHTML = '✓';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.innerHTML = orig;
+                    btn.classList.remove('copied');
+                }, 1500);
+            }
+        });
+    }
+
+    // ── 事件绑定 ──
+    generateBtn.addEventListener('click', generate);
+
+    copyMainBtn.addEventListener('click', function() {
+        if (!currentUUIDs.length) return;
+        copyText(currentUUIDs[0], copyMainBtn);
+    });
+
+    copyAllBtn.addEventListener('click', function() {
+        if (!currentUUIDs.length) return;
+        copyText(currentUUIDs.join('\n'), copyAllBtn);
+    });
+
+    // 格式切换时重新格式化
+    document.querySelectorAll('input[name="uuidFormat"]').forEach(function(r) {
+        r.addEventListener('change', function() {
+            if (currentUUIDs.length > 0) {
+                // 重新生成以应用新格式
+                generate();
+            }
+        });
+    });
+
+    // 页面加载时自动生成
+    generate();
+})();
+</script>
+    
+    {% include '_footer.html' %}
+</body>
+</html>

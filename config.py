@@ -171,6 +171,24 @@ SEO_META = {
         'keywords': '简繁转换,繁体转换,简体转繁体,繁体转简体,Word简繁,Excel简繁,PPT简繁,OpenCC,在线转换,文档转换',
         'path': '/zh-convert',
     },
+    'password_generator': {
+        'title': '密码生成器 - 在线随机安全密码生成工具',
+        'description': '在线生成高强度随机密码，支持自定义长度、字符类型（大写/小写/数字/符号）、批量生成。基于浏览器加密 API，本地生成不上传，保护隐私安全。',
+        'keywords': '密码生成器,随机密码,安全密码,密码强度,批量生成密码,在线工具,浏览器本地',
+        'path': '/password-generator',
+    },
+    'url_encode': {
+        'title': 'URL 编解码工具 - 在线 URL 编码解码',
+        'description': '在线 URL 编码与解码工具，支持 encodeURIComponent 和 encodeURI 两种模式，自动识别中文和特殊字符。浏览器本地处理，数据不上传服务器。',
+        'keywords': 'URL编码,URL解码,encodeURIComponent,encodeURI,网址编码,中文URL,在线工具,本地处理',
+        'path': '/url-encode',
+    },
+    'uuid_generator': {
+        'title': 'UUID 生成器 - 在线批量生成 UUID/GUID',
+        'description': '在线批量生成 UUID (Universally Unique Identifier)，支持 v4 随机 UUID，可自定义格式（大写/连字符/花括号）。基于 Web Crypto API，浏览器本地生成，无需上传。',
+        'keywords': 'UUID生成器,GUID生成,UUID v4,批量生成UUID,唯一标识符,在线工具,浏览器本地',
+        'path': '/uuid-generator',
+    },
 }
 
 # ── 简繁转换配置 ──

@@ -1,89 +1,109 @@
 /* ============================================
    核心共享样式 — 所有页面必须加载
+   设计语言: 现代 SaaS 风 · Indigo 主色 · 玻璃拟态
    ============================================ */
 
 /* ── CSS 变量定义 ── */
 :root {
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --transition-base: all 0.3s ease;
-    --transition-fast: all 0.15s ease;
+    --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.06);
-    --shadow-card-hover: 0 12px 30px rgba(59, 130, 246, 0.15), 0 4px 8px rgba(0, 0, 0, 0.08);
-    --primary: #3b82f6;
-    --primary-light: #eff6ff;
+    --radius-2xl: 20px;
 
-    --primary-200: #bfdbfe;
-    --primary-400: #60a5fa;
-    --primary-500: #3b82f6;
-    --primary-600: #2563eb;
-    --primary-700: #1d4ed8;
+    /* 阴影体系（层叠柔和） */
+    --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 16px 40px -12px rgba(15, 23, 42, 0.16), 0 4px 12px -6px rgba(15, 23, 42, 0.08);
+
+    /* 主色 Indigo */
+    --primary: #6366f1;
+    --primary-light: #eef2ff;
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
+    --primary-500: #6366f1;
+    --primary-600: #4f46e5;
+    --primary-700: #4338ca;
     --accent-500: #8b5cf6;
     --accent-600: #7c3aed;
     --success-500: #10b981;
     --warning-500: #f59e0b;
-    --danger-500: #ef4444;
+    --danger-500: #f43f5e;
     --info-500: #06b6d4;
 
     /* ── 工具类别色 ── */
-    --cat-pdf:        #ef4444;
-    --cat-pdf-light:  #fef2f2;
-    --cat-pdf-border: #fecaca;
-    --cat-pdf-bg:     #fee2e2;
+    --cat-pdf:         #e11d48;
+    --cat-pdf-light:   #fff1f2;
+    --cat-pdf-border:  #fecdd3;
+    --cat-pdf-bg:      #ffe4e6;
 
-    --cat-excel:      #10b981;
-    --cat-excel-light:#ecfdf5;
+    --cat-excel:       #059669;
+    --cat-excel-light: #ecfdf5;
     --cat-excel-border:#a7f3d0;
-    --cat-excel-bg:   #d1fae5;
+    --cat-excel-bg:    #d1fae5;
 
-    --cat-image:      #3b82f6;
-    --cat-image-light:#eff6ff;
-    --cat-image-border:#bfdbfe;
-    --cat-image-bg:   #dbeafe;
+    --cat-image:       #0284c7;
+    --cat-image-light: #f0f9ff;
+    --cat-image-border:#bae6fd;
+    --cat-image-bg:    #e0f2fe;
 
-    --cat-code:       #8b5cf6;
-    --cat-code-light: #f5f3ff;
-    --cat-code-border:#e9d5ff;
-    --cat-code-bg:    #f3e8ff;
+    --cat-code:        #7c3aed;
+    --cat-code-light:  #f5f3ff;
+    --cat-code-border: #ddd6fe;
+    --cat-code-bg:     #ede9fe;
 
-    --cat-security:   #6366f1;
-    --cat-security-light:#eef2ff;
-    --cat-security-border:#c7d2fe;
-    --cat-security-bg:#e0e7ff;
+    --cat-security:       #0d9488;
+    --cat-security-light: #f0fdfa;
+    --cat-security-border:#99f6e4;
+    --cat-security-bg:    #ccfbf1;
 
-    --cat-qr:         #f59e0b;
+    --cat-qr:         #d97706;
     --cat-qr-light:   #fffbeb;
     --cat-qr-border:  #fde68a;
     --cat-qr-bg:      #fef3c7;
 
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
+    /* 类别悬停光晕（低饱和） */
+    --glow-pdf:      rgba(225, 29, 72, 0.16);
+    --glow-excel:    rgba(5, 150, 105, 0.16);
+    --glow-image:    rgba(2, 132, 199, 0.16);
+    --glow-code:     rgba(124, 58, 237, 0.18);
+    --glow-security: rgba(13, 148, 136, 0.16);
+    --glow-qr:       rgba(217, 119, 6, 0.18);
 
+    /* ── 中性色 Slate ── */
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+
+    /* ── 语义变量 ── */
     --bg-primary: #ffffff;
     --bg-secondary: #f8fafc;
     --bg-card: #ffffff;
-    --bg-card-hover: #f0f9ff;
+    --bg-card-hover: #fafbff;
     --bg-input: #f8fafc;
-    --bg-nav: rgba(255, 255, 255, 0.95);
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
+    --bg-nav: rgba(255, 255, 255, 0.78);
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
     --border-color: #e2e8f0;
-    --border-focus: #3b82f6;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --border-strong: #cbd5e1;
+    --border-focus: #6366f1;
+    --grid-line: rgba(15, 23, 42, 0.045);
+    --shadow-color: rgba(15, 23, 42, 0.08);
 }
 
 /* ── 重置与基础 ── */
@@ -101,28 +121,47 @@ html {
 body {
     font-family: var(--font-sans);
     background: var(--bg-secondary);
-    color: var(--gray-800);
+    color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── 顶部导航 ── */
+::selection {
+    background: rgba(99, 102, 241, 0.22);
+}
+
+/* 图标基类：随行内文字对齐 */
+svg.icon {
+    flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* 键盘焦点可见性 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible + label {
+    outline: 2px solid var(--primary-400);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* ── 顶部导航（玻璃拟态） ── */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--gray-200);
+    background: var(--bg-nav);
+    backdrop-filter: blur(16px) saturate(1.6);
+    -webkit-backdrop-filter: blur(16px) saturate(1.6);
+    border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
     z-index: 1000;
     padding: 0 24px;
-    height: 60px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: var(--shadow-sm);
 }
 
 .navbar-brand {
@@ -134,21 +173,23 @@ body {
 }
 
 .navbar-brand-icon {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
-    border-radius: var(--radius-md);
+    width: 34px;
+    height: 34px;
+    background: linear-gradient(160deg, var(--primary-500), var(--primary-700));
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
     color: white;
-    box-shadow: var(--shadow-md);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 2px 6px -1px rgba(79, 70, 229, 0.45);
 }
 
 .navbar-brand-text {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--gray-900);
 }
 
@@ -161,19 +202,20 @@ body {
 
 .navbar-search input {
     width: 100%;
-    padding: 9px 16px 9px 42px;
+    padding: 9px 40px 9px 40px;
     font-size: 14px;
-    border: 1.5px solid var(--gray-200);
+    border: 1px solid transparent;
     border-radius: var(--radius-lg);
-    background: var(--gray-50);
+    background: var(--gray-100);
     outline: none;
     transition: var(--transition-base);
+    color: var(--gray-800);
 }
 
 .navbar-search input:focus {
-    border-color: var(--primary-500);
+    border-color: var(--primary-400);
     background: white;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 .navbar-search-icon {
@@ -181,8 +223,8 @@ body {
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
+    display: inline-flex;
     color: var(--gray-400);
-    font-size: 15px;
 }
 
 .navbar-search kbd {
@@ -192,9 +234,10 @@ body {
     transform: translateY(-50%);
     font-size: 11px;
     padding: 2px 6px;
-    background: var(--gray-100);
-    border: 1px solid var(--gray-200);
-    border-radius: 4px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-xs);
+    border-radius: 5px;
     color: var(--gray-400);
     font-family: var(--font-sans);
 }
@@ -210,18 +253,17 @@ body {
     height: 36px;
     border-radius: var(--radius-md);
     border: none;
-    background: var(--gray-100);
-    color: var(--gray-600);
+    background: transparent;
+    color: var(--gray-500);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
     transition: var(--transition-fast);
 }
 
 .btn-icon:hover {
-    background: var(--gray-200);
+    background: var(--gray-100);
     color: var(--gray-800);
 }
 
@@ -241,20 +283,23 @@ body {
     font-size: 13px;
     font-weight: 500;
     margin-bottom: 20px;
-    padding: 6px 14px;
-    background: var(--gray-100);
-    border-radius: var(--radius-md);
+    padding: 6px 14px 6px 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
     transition: var(--transition-fast);
 }
 
 .tool-page .back-link:hover {
     color: var(--primary-600);
+    border-color: var(--primary-200);
     background: var(--primary-light);
 }
 
 .tool-page h1 {
     font-size: 28px;
     font-weight: 800;
+    letter-spacing: -0.02em;
     color: var(--gray-900);
     margin-bottom: 8px;
     display: flex;
@@ -270,7 +315,7 @@ body {
 }
 
 .tool-page .page-desc {
-    color: var(--gray-600);
+    color: var(--text-secondary);
     font-size: 15px;
     margin-bottom: 8px;
     line-height: 1.7;
@@ -283,33 +328,33 @@ body {
     gap: 12px;
     margin-bottom: 28px;
     padding: 12px 16px;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     font-size: 13px;
-    color: var(--gray-600);
+    color: var(--text-secondary);
 }
 
 .trust-bar-item {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
-.trust-bar-item svg {
+.trust-bar-item svg.icon {
     width: 14px;
     height: 14px;
-    flex-shrink: 0;
+    color: var(--gray-400);
 }
 
 /* ── 工具区块 ── */
 .tool-section {
-    background: white;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
     padding: 24px;
     margin-bottom: 20px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
 }
 
 .tool-tabs {
@@ -317,26 +362,33 @@ body {
     gap: 4px;
     margin-bottom: 20px;
     background: var(--gray-100);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     padding: 4px;
 }
 
 .tool-tab {
     flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     padding: 10px 16px;
     border: none;
     background: transparent;
-    color: var(--gray-600);
+    color: var(--gray-500);
     font-size: 14px;
-    font-weight: 500;
-    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
+.tool-tab svg.icon { width: 15px; height: 15px; }
+
 .tool-tab:hover {
     color: var(--gray-800);
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.65);
 }
 
 .tool-tab.active {
@@ -345,89 +397,122 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 
 /* ── Mode Tabs ── */
 .mode-tabs {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin: 0 0 24px 0;
-    padding: 6px;
+    padding: 5px;
     background: var(--gray-100);
     border-radius: var(--radius-lg);
-    border: 1px solid var(--gray-200);
 }
 
 .mode-tab {
     flex: 1;
-    padding: 12px 20px;
-    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 20px;
+    font-size: 14px;
     font-weight: 600;
     border: none;
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--gray-600);
+    color: var(--gray-500);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     font-family: inherit;
 }
 
+.mode-tab svg.icon { width: 15px; height: 15px; }
+
 .mode-tab:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.65);
     color: var(--gray-800);
 }
 
 .mode-tab.active {
-    background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
-    color: white;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
-    transform: translateY(-1px);
+    background: var(--bg-card);
+    color: var(--primary-600);
+    box-shadow:
+        var(--shadow-sm),
+        inset 0 0 0 1px var(--primary-200);
 }
 
-.mode-tab.active:hover {
-    background: linear-gradient(135deg, var(--primary-600), var(--accent-600));
-    color: white;
-}
-
-.mode-content {
-    display: none;
-}
+.mode-content { display: none; }
 
 .mode-content.active {
     display: block;
     animation: fadeInUp 0.3s ease;
 }
 
+/* type-tab（二维码等页使用） */
+.type-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border: none;
+    background: transparent;
+    color: var(--gray-500);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.type-tab svg.icon { width: 14px; height: 14px; }
+
+.type-tab:hover {
+    color: var(--gray-800);
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.type-tab.active {
+    background: var(--bg-card);
+    color: var(--primary-600);
+    box-shadow: var(--shadow-sm);
+}
+
 /* ── 工具图标颜色变体 ── */
 .tool-icon.pdf {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
-    color: #dc2626;
+    background: linear-gradient(135deg, var(--cat-pdf-bg), var(--cat-pdf-border));
+    color: var(--cat-pdf);
 }
 .tool-icon.excel {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    color: #059669;
+    background: linear-gradient(135deg, var(--cat-excel-bg), var(--cat-excel-border));
+    color: var(--cat-excel);
 }
 .tool-icon.image {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    color: #2563eb;
+    background: linear-gradient(135deg, var(--cat-image-bg), var(--cat-image-border));
+    color: var(--cat-image);
 }
 .tool-icon.code {
-    background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
-    color: #7c3aed;
-}
-.tool-icon.tool {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
-    color: #d97706;
+    background: linear-gradient(135deg, var(--cat-code-bg), var(--cat-code-border));
+    color: var(--cat-code);
 }
 .tool-icon.security {
-    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
-    color: #4f46e5;
+    background: linear-gradient(135deg, var(--cat-security-bg), var(--cat-security-border));
+    color: var(--cat-security);
+}
+.tool-icon.tool {
+    background: linear-gradient(135deg, var(--cat-qr-bg), var(--cat-qr-border));
+    color: var(--cat-qr);
+}
+
+.tool-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
 }
 
 /* ── 工具类别色条（详情页顶部） ── */
@@ -438,12 +523,12 @@ body {
 .tool-page.security-page h1 { color: var(--cat-security); }
 .tool-page.qr-page h1 { color: var(--cat-qr); }
 
-.tool-page.pdf-page .back-link:hover { color: var(--cat-pdf); background: var(--cat-pdf-light); }
-.tool-page.excel-page .back-link:hover { color: var(--cat-excel); background: var(--cat-excel-light); }
-.tool-page.image-page .back-link:hover { color: var(--cat-image); background: var(--cat-image-light); }
-.tool-page.code-page .back-link:hover { color: var(--cat-code); background: var(--cat-code-light); }
-.tool-page.security-page .back-link:hover { color: var(--cat-security); background: var(--cat-security-light); }
-.tool-page.qr-page .back-link:hover { color: var(--cat-qr); background: var(--cat-qr-light); }
+.tool-page.pdf-page .back-link:hover { color: var(--cat-pdf); background: var(--cat-pdf-light); border-color: var(--cat-pdf-border); }
+.tool-page.excel-page .back-link:hover { color: var(--cat-excel); background: var(--cat-excel-light); border-color: var(--cat-excel-border); }
+.tool-page.image-page .back-link:hover { color: var(--cat-image); background: var(--cat-image-light); border-color: var(--cat-image-border); }
+.tool-page.code-page .back-link:hover { color: var(--cat-code); background: var(--cat-code-light); border-color: var(--cat-code-border); }
+.tool-page.security-page .back-link:hover { color: var(--cat-security); background: var(--cat-security-light); border-color: var(--cat-security-border); }
+.tool-page.qr-page .back-link:hover { color: var(--cat-qr); background: var(--cat-qr-light); border-color: var(--cat-qr-border); }
 
 /* ── 工具类 ── */
 .hidden { display: none !important; }
@@ -466,6 +551,11 @@ body {
     50% { opacity: 0.5; }
 }
 
+@keyframes shimmer {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+}
+
 /* ── 响应式调整 ── */
 @media (max-width: 768px) {
     .navbar { padding: 0 16px; height: 56px; }
@@ -475,64 +565,78 @@ body {
     .trust-bar { gap: 8px; font-size: 12px; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 /* ════════════════════════════════════════
-   夜间模式
+   夜间模式 — 系统化 token 覆盖
    ════════════════════════════════════════ */
 
 [data-theme="dark"] {
-    --bg-primary: #1e1e1e;
-    --bg-secondary: #121212;
-    --bg-card: #1e1e1e;
-    --bg-card-hover: #2a2a2a;
-    --bg-input: #2a2a2a;
-    --bg-nav: rgba(30, 30, 30, 0.95);
-    --text-primary: #e5e5e5;
-    --text-secondary: #a3a3a3;
-    --text-muted: #6b7280;
-    --border-color: #3f3f3f;
-    --border-focus: #60a5fa;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-    --primary-500: #60a5fa;
-    --primary-600: #3b82f6;
-    --primary-700: #2563eb;
+    --bg-primary: #161b26;
+    --bg-secondary: #0c0f16;
+    --bg-card: #151a24;
+    --bg-card-hover: #1a2130;
+    --bg-input: #131824;
+    --bg-nav: rgba(12, 15, 22, 0.75);
+    --text-primary: #e6eaf2;
+    --text-secondary: #98a2b3;
+    --text-muted: #5d6b80;
+    --border-color: #232b3a;
+    --border-strong: #303a4e;
+    --border-focus: #818cf8;
+    --grid-line: rgba(148, 163, 184, 0.06);
+    --shadow-color: rgba(0, 0, 0, 0.4);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.55);
+
+    --primary: #818cf8;
+    --primary-light: rgba(99, 102, 241, 0.14);
+    --primary-200: #3730a3;
+    --primary-400: #818cf8;
+    --primary-500: #818cf8;
+    --primary-600: #6366f1;
+    --primary-700: #4f46e5;
     --accent-500: #a78bfa;
     --accent-600: #8b5cf6;
-    --gray-100: #1f2937;
-    --gray-200: #374151;
-    --gray-300: #4b5563;
-    --gray-400: #6b7280;
-    --gray-500: #9ca3af;
-    --gray-600: #d1d5db;
-    --gray-700: #e5e7eb;
-    --gray-800: #f3f4f6;
-    --gray-900: #f9fafb;
-    --cat-pdf-light: #451a1a;
-    --cat-pdf-border: #991b1b;
-    --cat-pdf-bg: #7f1d1d;
-    --cat-excel-light: #064e3b;
-    --cat-excel-border: #065f46;
-    --cat-excel-bg: #064e3b;
-    --cat-image-light: #1e3a8a;
-    --cat-image-border: #1e40af;
-    --cat-image-bg: #1e3a8a;
-    --cat-code-light: #3b0764;
-    --cat-code-border: #4c1d95;
-    --cat-code-bg: #3b0764;
-    --cat-security-light: #2e1065;
-    --cat-security-border: #3730a3;
-    --cat-security-bg: #2e1065;
-    --cat-qr-light: #78350f;
-    --cat-qr-border: #92400e;
-    --cat-qr-bg: #78350f;
+
+    --gray-50: #141926;
+    --gray-100: #1a2030;
+    --gray-200: #272f42;
+    --gray-300: #39435a;
+    --gray-400: #5d6b80;
+    --gray-500: #8593aa;
+    --gray-600: #aab6c8;
+    --gray-700: #ccd5e4;
+    --gray-800: #e3e8f1;
+    --gray-900: #f2f5fa;
+
+    --glow-pdf:      rgba(244, 63, 94, 0.14);
+    --glow-excel:    rgba(16, 185, 129, 0.14);
+    --glow-image:    rgba(14, 165, 233, 0.14);
+    --glow-code:     rgba(139, 92, 246, 0.16);
+    --glow-security: rgba(20, 184, 166, 0.14);
+    --glow-qr:       rgba(245, 158, 11, 0.16);
+}
+
+[data-theme="dark"] body {
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .navbar {
     background: var(--bg-nav);
-    border-bottom-color: #333;
+    border-bottom-color: var(--border-color);
 }
 
 [data-theme="dark"] .navbar-brand-text,
-[data-theme="dark"] .tool-name,
 [data-theme="dark"] h1,
 [data-theme="dark"] h2,
 [data-theme="dark"] h3 {
@@ -544,22 +648,9 @@ body {
     color: var(--text-secondary);
 }
 
-[data-theme="dark"] .tool-tabs,
-[data-theme="dark"] .mode-tabs {
-    background: #2a2a2a;
-}
-
-[data-theme="dark"] .tool-tab,
-[data-theme="dark"] .mode-tab,
-[data-theme="dark"] .type-tab {
-    color: #888;
-}
-
-[data-theme="dark"] .tool-tab.active,
-[data-theme="dark"] .mode-tab.active,
-[data-theme="dark"] .type-tab.active {
-    background: var(--bg-card);
-    color: #60a5fa;
+[data-theme="dark"] .btn-icon:hover {
+    background: var(--gray-100);
+    color: var(--text-primary);
 }
 
 [data-theme="dark"] .tool-section {
@@ -567,21 +658,67 @@ body {
     border-color: var(--border-color);
 }
 
+[data-theme="dark"] .tool-tab.active,
+[data-theme="dark"] .type-tab.active {
+    background: var(--bg-card-hover);
+    color: var(--primary-400);
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .mode-tab.active {
+    background: var(--bg-card-hover);
+    color: var(--primary-400);
+    box-shadow:
+        var(--shadow-sm),
+        inset 0 0 0 1px var(--border-strong);
+}
+
+[data-theme="dark"] .tool-tab:hover,
+[data-theme="dark"] .mode-tab:hover,
+[data-theme="dark"] .type-tab:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
 [data-theme="dark"] .tool-page .back-link {
-    background: #2a2a2a;
+    background: var(--bg-card);
+    border-color: var(--border-color);
     color: var(--text-secondary);
 }
 
 [data-theme="dark"] .tool-page .back-link:hover {
-    color: var(--primary-500);
-}
-
-[data-theme="dark"] .tool-page h1 {
-    color: var(--text-primary);
+    color: var(--primary-400);
+    background: var(--primary-light);
+    border-color: var(--primary-200);
 }
 
 [data-theme="dark"] .trust-bar {
-    background: #1a1a1a;
+    background: var(--bg-card);
     border-color: var(--border-color);
     color: var(--text-secondary);
+}
+
+/* 夜间模式下工具图标底座改为半透明类别色 */
+[data-theme="dark"] .tool-icon.pdf {
+    background: linear-gradient(135deg, rgba(244, 63, 94, 0.16), rgba(244, 63, 94, 0.08));
+    color: #fb7185;
+}
+[data-theme="dark"] .tool-icon.excel {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(16, 185, 129, 0.08));
+    color: #34d399;
+}
+[data-theme="dark"] .tool-icon.image {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.16), rgba(14, 165, 233, 0.08));
+    color: #38bdf8;
+}
+[data-theme="dark"] .tool-icon.code {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.18), rgba(139, 92, 246, 0.09));
+    color: #a78bfa;
+}
+[data-theme="dark"] .tool-icon.security {
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.16), rgba(20, 184, 166, 0.08));
+    color: #2dd4bf;
+}
+[data-theme="dark"] .tool-icon.tool {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.16), rgba(245, 158, 11, 0.08));
+    color: #fbbf24;
 }

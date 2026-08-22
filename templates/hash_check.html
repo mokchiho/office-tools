@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.hash_check.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.hash_check.title,
         description=seo_meta.hash_check.description,
@@ -28,34 +29,34 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page code-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon security">🔐</div>
+            <div class="tool-icon security">{{ icon('hash', 22) }}</div>
             文件哈希校验
         </h1>
         <p class="page-desc">计算文件的 <strong>MD5 / SHA1 / SHA256 / SHA512</strong> 哈希值，验证文件完整性。<br>
         全部在浏览器本地计算，<strong>文件不上传服务器</strong>，保护您的数据隐私。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 浏览器本地计算</span>
-            <span class="trust-bar-item">📦 不上传服务器</span>
-            <span class="trust-bar-item">⏱ 即时完成</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地计算</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 即时完成</span>
         </div>
 
 
@@ -63,7 +64,7 @@
             <div class="input-group">
                 <label class="input-label">选择文件</label>
                 <div class="upload-zone" id="hashDropZone" style="padding:40px 20px;">
-                    <div class="upload-icon" style="font-size:40px;">📂</div>
+                    <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
                     <p class="upload-text">拖放文件到此处</p>
                     <p class="upload-hint">或点击选择文件</p>
                     <input type="file" id="hashFileInput" hidden>
@@ -91,7 +92,7 @@
                         <input type="radio" name="algo" value="MD5"> MD5
                     </label>
                 </div>
-                <p style="font-size:12px;color:#94a3b8;margin-top:8px;">💡 SHA-256 适用于安全验证，MD5 仅适用于非安全场景</p>
+                <p style="font-size:12px;color:#94a3b8;margin-top:8px;">{{ icon('lightbulb', 13) }} SHA-256 适用于安全验证，MD5 仅适用于非安全场景</p>
             </div>
 
             <div id="hashProgress" class="progress hidden">
@@ -103,7 +104,7 @@
                 <div class="hash-row">
                     <span class="hash-label" id="hashAlgoLabel">SHA-256</span>
                     <span class="hash-value" id="hashValueText"></span>
-                    <button class="btn-sm" id="hashCopyBtn" style="flex-shrink:0;">📋 复制</button>
+                    <button class="btn-sm" id="hashCopyBtn" style="flex-shrink:0;">{{ icon('clipboard', 14) }} 复制</button>
                 </div>
                 <p id="hashElapsed" style="margin-top:12px;font-size:13px;color:#64748b;"></p>
             </div>
@@ -117,7 +118,7 @@
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -171,22 +172,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/base64" class="related-tool-card">
-            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
             <span class="related-tool-name">Base64 编解码</span>
         </a>
         <a href="/json-tool" class="related-tool-card">
-            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
             <span class="related-tool-name">JSON 格式化</span>
         </a>
         <a href="/timestamp" class="related-tool-card">
-            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
             <span class="related-tool-name">时间戳转换</span>
         </a>
         <a href="/pdf-encrypt" class="related-tool-card">
-            <span class="related-tool-icon">🔒</span>
+            <span class="related-tool-icon">{{ icon('lock', 24) }}</span>
             <span class="related-tool-name">PDF 加密/解密</span>
         </a>
     </div>
@@ -294,7 +295,7 @@
 
                 progressBar.style.width = '100%';
                 const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
-                hashStatusText.textContent = `${algo} 计算完成 ✅`;
+                hashStatusText.textContent = `${algo} 计算完成`;
 
                 lastHash = hashHex;
                 hashAlgoLabel.textContent = algo;
@@ -319,8 +320,8 @@
         document.getElementById('hashCopyBtn').addEventListener('click', () => {
             navigator.clipboard.writeText(lastHash).then(() => {
                 const btn = document.getElementById('hashCopyBtn');
-                btn.textContent = '✅ 已复制';
-                setTimeout(() => btn.textContent = '📋 复制', 1500);
+                btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+                setTimeout(() => btn.innerHTML = window.toolIcon('clipboard') + ' 复制', 1500);
             });
         });
 
@@ -332,10 +333,10 @@
                 return;
             }
             if (input === lastHash.toLowerCase()) {
-                compareResult.textContent = '✅ 哈希值匹配！文件完整。';
+                compareResult.textContent = '哈希值匹配！文件完整。';
                 compareResult.className = 'compare-result match';
             } else if (input.length === lastHash.length) {
-                compareResult.textContent = '❌ 哈希值不匹配！文件可能已被篡改。';
+                compareResult.textContent = '哈希值不匹配！文件可能已被篡改。';
                 compareResult.className = 'compare-result mismatch';
             }
             compareResult.classList.remove('hidden');

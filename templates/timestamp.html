@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.timestamp.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.timestamp.title,
         description=seo_meta.timestamp.description,
@@ -28,41 +29,41 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page code-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon code">⏱</div>
+            <div class="tool-icon code">{{ icon('clock', 22) }}</div>
             时间戳转换
         </h1>
         <p class="page-desc">Unix 时间戳与日期时间互转，支持 <strong>秒/毫秒自动识别</strong>。<br>
         全部在浏览器本地处理，<strong>不经过服务器</strong>。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 浏览器本地处理</span>
-            <span class="trust-bar-item">📦 不上传服务器</span>
-            <span class="trust-bar-item">⏱ 即时完成</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 即时完成</span>
         </div>
 
 
         <div class="tool-section">
             <div class="tool-tabs">
-                <button class="tool-tab active" data-tab="ts2date">🕐 时间戳 → 日期</button>
-                <button class="tool-tab" data-tab="date2ts">📅 日期 → 时间戳</button>
+                <button class="tool-tab active" data-tab="ts2date">{{ icon('clock', 15) }} 时间戳 → 日期</button>
+                <button class="tool-tab" data-tab="date2ts">{{ icon('calendar', 15) }} 日期 → 时间戳</button>
             </div>
 
             <!-- Tab: 时间戳→日期 -->
@@ -71,7 +72,7 @@
                     <label class="input-label">Unix 时间戳</label>
                     <div class="input-row">
                         <input type="text" id="tsInput" class="tool-input" placeholder="例如: 1718697600 或 1718697600000">
-                        <button id="tsNowBtn" class="btn-sm">🕒 当前时间</button>
+                        <button id="tsNowBtn" class="btn-sm">{{ icon('clock', 14) }} 当前时间</button>
                     </div>
                     <p class="input-hint">秒（≤ 9999999999）或 毫秒（> 9999999999）自动识别</p>
                 </div>
@@ -126,7 +127,7 @@
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -180,22 +181,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/json-tool" class="related-tool-card">
-            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
             <span class="related-tool-name">JSON 格式化</span>
         </a>
         <a href="/base64" class="related-tool-card">
-            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
             <span class="related-tool-name">Base64 编解码</span>
         </a>
         <a href="/qrcode" class="related-tool-card">
-            <span class="related-tool-icon">📱</span>
+            <span class="related-tool-icon">{{ icon('qr-code', 24) }}</span>
             <span class="related-tool-name">二维码生成</span>
         </a>
         <a href="/hash-check" class="related-tool-card">
-            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-icon">{{ icon('hash', 24) }}</span>
             <span class="related-tool-name">文件哈希校验</span>
         </a>
     </div>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.qrcode.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.qrcode.title,
         description=seo_meta.qrcode.description,
@@ -29,44 +30,44 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page qr-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon tool">📱</div>
+            <div class="tool-icon tool">{{ icon('qr-code', 22) }}</div>
             二维码生成
         </h1>
         <p class="page-desc">生成可下载的二维码图片，支持 <strong>文本/网址/WiFi/邮箱/电话/短信</strong> 等多种类型。<br>
         支持自定义颜色和纠错级别，可下载 <strong>PNG</strong>（位图）和 <strong>SVG</strong>（矢量）格式。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 即时生成</span>
-            <span class="trust-bar-item">📦 PNG/SVG下载</span>
-            <span class="trust-bar-item">⏱ 不保存数据</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 即时生成</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} PNG/SVG下载</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 不保存数据</span>
         </div>
 
 
         <div class="type-tabs">
-            <button class="type-tab active" data-type="text">📝 文本</button>
-            <button class="type-tab" data-type="url">🔗 网址</button>
-            <button class="type-tab" data-type="wifi">📶 WiFi</button>
-            <button class="type-tab" data-type="email">📧 邮箱</button>
-            <button class="type-tab" data-type="phone">📞 电话</button>
-            <button class="type-tab" data-type="sms">💬 短信</button>
+            <button class="type-tab active" data-type="text">{{ icon('type', 14) }} 文本</button>
+            <button class="type-tab" data-type="url">{{ icon('link', 14) }} 网址</button>
+            <button class="type-tab" data-type="wifi">{{ icon('wifi', 14) }} WiFi</button>
+            <button class="type-tab" data-type="email">{{ icon('mail', 14) }} 邮箱</button>
+            <button class="type-tab" data-type="phone">{{ icon('phone', 14) }} 电话</button>
+            <button class="type-tab" data-type="sms">{{ icon('message-square', 14) }} 短信</button>
         </div>
 
         <div class="qr-grid">
@@ -75,7 +76,7 @@
                 <!-- 类型内容区：文本 -->
                 <div id="type-text" class="type-content active">
                     <div class="option-section">
-                        <div class="option-section-title">📝 文本内容</div>
+                        <div class="option-section-title">{{ icon('type', 15) }} 文本内容</div>
                         <textarea id="textInput" class="qr-textarea" rows="4" placeholder="输入任意文本内容，支持中文、英文、特殊字符..."></textarea>
                     </div>
                 </div>
@@ -83,7 +84,7 @@
                 <!-- 类型内容区：网址 -->
                 <div id="type-url" class="type-content">
                     <div class="option-section">
-                        <div class="option-section-title">🔗 网址 URL</div>
+                        <div class="option-section-title">{{ icon('link', 15) }} 网址 URL</div>
                         <input type="text" id="urlInput" class="qr-input" placeholder="https://example.com">
                     </div>
                 </div>
@@ -91,7 +92,7 @@
                 <!-- 类型内容区：WiFi -->
                 <div id="type-wifi" class="type-content">
                     <div class="option-section">
-                        <div class="option-section-title">📶 网络名称</div>
+                        <div class="option-section-title">{{ icon('wifi', 15) }} 网络名称</div>
                         <div class="option-row">
                             <span class="option-label">网络名称</span>
                             <input type="text" id="wifiSsid" class="qr-input" placeholder="WiFi 名称 (SSID)">
@@ -114,7 +115,7 @@
                 <!-- 类型内容区：邮箱 -->
                 <div id="type-email" class="type-content">
                     <div class="option-section">
-                        <div class="option-section-title">📧 邮箱</div>
+                        <div class="option-section-title">{{ icon('mail', 15) }} 邮箱</div>
                         <div class="option-row">
                             <span class="option-label">收件人</span>
                             <input type="text" id="emailTo" class="qr-input" placeholder="user@example.com">
@@ -133,7 +134,7 @@
                 <!-- 类型内容区：电话 -->
                 <div id="type-phone" class="type-content">
                     <div class="option-section">
-                        <div class="option-section-title">📞 电话号码</div>
+                        <div class="option-section-title">{{ icon('phone', 15) }} 电话号码</div>
                         <input type="text" id="phoneInput" class="qr-input" placeholder="+8613800138000">
                     </div>
                 </div>
@@ -141,7 +142,7 @@
                 <!-- 类型内容区：短信 -->
                 <div id="type-sms" class="type-content">
                     <div class="option-section">
-                        <div class="option-section-title">💬 短信</div>
+                        <div class="option-section-title">{{ icon('message-square', 15) }} 短信</div>
                         <div class="option-row">
                             <span class="option-label">收件人</span>
                             <input type="text" id="smsTo" class="qr-input" placeholder="+8613800138000">
@@ -155,7 +156,7 @@
 
                 <!-- 样式设置 -->
                 <div class="option-section">
-                    <div class="option-section-title">🎨 样式设置</div>
+                    <div class="option-section-title">{{ icon('palette', 15) }} 样式设置</div>
                     <div class="option-row">
                         <span class="option-label">纠错级别</span>
                         <select id="errorLevel" class="qr-select">
@@ -193,17 +194,17 @@
 
                 <div class="btn-row" style="justify-content: center; margin-top: 20px;">
                     <button id="downloadPng" class="btn btn-success" disabled style="width:auto;padding:12px 32px;">
-                        📥 下载 PNG
+                        {{ icon('download', 15) }} 下载 PNG
                     </button>
                     <button id="downloadSvg" class="btn-sm" disabled style="padding:12px 24px;">
-                        📥 下载 SVG
+                        {{ icon('download', 15) }} 下载 SVG
                     </button>
                 </div>
             </div>
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -257,22 +258,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/base64" class="related-tool-card">
-            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
             <span class="related-tool-name">Base64 编解码</span>
         </a>
         <a href="/image-convert" class="related-tool-card">
-            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-icon">{{ icon('arrow-right-left', 24) }}</span>
             <span class="related-tool-name">图片格式转换</span>
         </a>
         <a href="/timestamp" class="related-tool-card">
-            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
             <span class="related-tool-name">时间戳转换</span>
         </a>
         <a href="/json-tool" class="related-tool-card">
-            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
             <span class="related-tool-name">JSON 格式化</span>
         </a>
     </div>

@@ -12,12 +12,19 @@
 }
 
 .related-tools h2 {
-    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 19px;
     font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--gray-900);
     margin: 0 0 16px;
     text-align: center;
 }
+
+.related-tools h2 svg.icon { width: 18px; height: 18px; color: var(--gray-400); }
 
 .related-tools-grid {
     display: grid;
@@ -40,10 +47,10 @@
 }
 
 .related-tool-card:hover {
-    border-color: var(--primary);
+    border-color: var(--primary-300);
     background: var(--primary-light);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 8px 20px -8px rgba(79, 70, 229, 0.35);
 }
 
 .related-tool-icon {
@@ -64,11 +71,17 @@ section.faq {
 }
 
 section.faq > h2 {
-    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 19px;
     font-weight: 700;
+    letter-spacing: -0.01em;
     color: var(--gray-900);
     margin: 0 0 16px;
 }
+
+section.faq > h2 svg.icon { width: 18px; height: 18px; color: var(--gray-400); }
 
 section.faq .note {
     margin: 0;
@@ -133,7 +146,7 @@ section.faq h3 {
 }
 
 .site-footer-list a:hover {
-    color: var(--primary);
+    color: var(--primary-600);
 }
 
 .site-footer-bottom {
@@ -152,7 +165,7 @@ section.faq h3 {
 }
 
 .site-footer-bottom a:hover {
-    color: var(--primary);
+    color: var(--primary-600);
 }
 
 .site-footer-privacy {

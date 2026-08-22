@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.json_tool.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.json_tool.title,
         description=seo_meta.json_tool.description,
@@ -28,34 +29,34 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page code-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon code">{ }</div>
+            <div class="tool-icon code">{{ icon('braces', 22) }}</div>
             JSON 格式化工具
         </h1>
         <p class="page-desc">JSON 美化（格式化）、压缩（去空格）、语法校验。<br>
         全部在浏览器本地处理，<strong>不经过服务器</strong>，保护您的数据安全。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 浏览器本地处理</span>
-            <span class="trust-bar-item">📦 不上传服务器</span>
-            <span class="trust-bar-item">⏱ 即时完成</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 即时完成</span>
         </div>
 
 
@@ -76,18 +77,18 @@
                 </div>
 
                 <div class="btn-row">
-                    <button id="formatBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;background: linear-gradient(135deg, #3b82f6, #2563eb);">✨ 美化 (2格)</button>
-                    <button id="format4Btn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 美化 (4格)</button>
-                    <button id="compactBtn" class="btn-sm">📦 压缩</button>
+                    <button id="formatBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">美化 (2格)</button>
+                    <button id="format4Btn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">美化 (4格)</button>
+                    <button id="compactBtn" class="btn-sm">压缩</button>
                     <button id="validateBtn" class="btn-sm">✓ 校验</button>
-                    <button id="jsonClearBtn" class="btn-sm">🗑 清空</button>
+                    <button id="jsonClearBtn" class="btn-sm">清空</button>
                 </div>
 
                 <div class="input-group" style="margin-top: 20px;">
                     <label class="input-label">输出结果</label>
-                    <textarea id="jsonOutput" class="tool-textarea tool-output" rows="10" readonly placeholder="结果将显示在这里..." onclick="this.select()" spellcheck="false" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <textarea id="jsonOutput" class="tool-textarea tool-output output-success" rows="10" readonly placeholder="结果将显示在这里..." onclick="this.select()" spellcheck="false"></textarea>
                     <div class="btn-row" style="margin-top:8px;">
-                        <button id="jsonCopyBtn" class="btn-sm">📋 复制结果</button>
+                        <button id="jsonCopyBtn" class="btn-sm">{{ icon('clipboard', 14) }} 复制结果</button>
                     </div>
                 </div>
             </div>
@@ -106,7 +107,7 @@
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -161,22 +162,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/base64" class="related-tool-card">
-            <span class="related-tool-icon">🔤</span>
+            <span class="related-tool-icon">{{ icon('type', 24) }}</span>
             <span class="related-tool-name">Base64 编解码</span>
         </a>
         <a href="/timestamp" class="related-tool-card">
-            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
             <span class="related-tool-name">时间戳转换</span>
         </a>
         <a href="/hash-check" class="related-tool-card">
-            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-icon">{{ icon('hash', 24) }}</span>
             <span class="related-tool-name">文件哈希校验</span>
         </a>
         <a href="/csv-excel" class="related-tool-card">
-            <span class="related-tool-icon">🔄</span>
+            <span class="related-tool-icon">{{ icon('arrow-right-left', 24) }}</span>
             <span class="related-tool-name">CSV ↔ Excel</span>
         </a>
     </div>
@@ -218,9 +219,9 @@
                     const pos = parseInt(match[1]);
                     const before = raw.substring(0, pos);
                     const lineNum = (before.match(/\n/g) || []).length + 1;
-                    jsonError.textContent = `⚠️ 第 ${lineNum} 行出错: ${e.message}`;
+                    jsonError.textContent = `第 ${lineNum} 行出错: ${e.message}`;
                 } else {
-                    jsonError.textContent = '���️ ' + e.message;
+                    jsonError.textContent = e.message;
                 }
                 jsonStats.textContent = '';
             }
@@ -231,7 +232,7 @@
             if (!raw) return;
             try {
                 JSON.parse(raw);
-                jsonOutput.value = '✅ JSON 语法正确';
+                jsonOutput.value = 'JSON 语法正确';
                 jsonStats.textContent = '';
                 jsonError.textContent = '';
             } catch (e) {
@@ -257,8 +258,8 @@
             if (!jsonOutput.value) return;
             navigator.clipboard.writeText(jsonOutput.value).then(() => {
                 const btn = document.getElementById('jsonCopyBtn');
-                btn.textContent = '✅ 已复制';
-                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+                btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+                setTimeout(() => btn.innerHTML = window.toolIcon('clipboard') + ' 复制结果', 1500);
             });
         });
 

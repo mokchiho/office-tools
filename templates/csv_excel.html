@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.csv_excel.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.csv_excel.title,
         description=seo_meta.csv_excel.description,
@@ -28,46 +29,46 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page excel-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon excel">🔄</div>
+            <div class="tool-icon excel">{{ icon('arrow-right-left', 22) }}</div>
             CSV ↔ Excel 转换
         </h1>
         <p class="page-desc"><strong>CSV → Excel：</strong>解决 Excel 打开 CSV 乱码问题，自动检测编码。<br>
         <strong>Excel → CSV：</strong>将 Excel 工作表导出为 CSV，支持 UTF-8 编码。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 服务器端处理</span>
-            <span class="trust-bar-item">📦 编码自动检测</span>
-            <span class="trust-bar-item">⏱ 30分钟清理</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 服务器端处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 编码自动检测</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 30分钟清理</span>
         </div>
 
 
         <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="csv2excel">📥 CSV → Excel</button>
-            <button class="mode-tab" data-mode="excel2csv">📤 Excel → CSV</button>
+            <button class="mode-tab active" data-mode="csv2excel">{{ icon('table', 15) }} CSV → Excel</button>
+            <button class="mode-tab" data-mode="excel2csv">{{ icon('file-text', 15) }} Excel → CSV</button>
         </div>
 
         <!-- CSV → Excel 模式 -->
         <div class="mode-content active" id="csv2excelMode">
             <div class="upload-zone" id="csvDropZone">
-                <div class="upload-icon">📂</div>
+                <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
                 <p class="upload-text">拖放 CSV 文件到此处</p>
                 <p class="upload-hint">或点击选择文件</p>
                 <input type="file" id="csvFileInput" accept=".csv" hidden>
@@ -79,22 +80,22 @@
                 <button id="csvRemoveBtn" class="btn-remove">✕</button>
             </div>
 
-            <button id="csvConvertBtn" class="btn btn-primary hidden">🚀 转换为 Excel</button>
+            <button id="csvConvertBtn" class="btn btn-primary hidden">转换为 Excel</button>
             <div id="csvProgress" class="progress hidden">
                 <div class="progress-bar" id="csvProgressBar"></div>
                 <p id="csvStatusText">转换中...</p>
             </div>
             <div id="csvError" class="error hidden"></div>
             <div id="csvResult" class="result hidden">
-                <p>✅ 转换完成！</p>
-                <a id="csvDownloadLink" class="btn btn-success" download>📥 下载 Excel</a>
+                <p>{{ icon('circle-check', 20) }} 转换完成！</p>
+                <a id="csvDownloadLink" class="btn btn-success" download>{{ icon('download', 16) }} 下载 Excel</a>
             </div>
         </div>
 
         <!-- Excel → CSV 模式 -->
         <div class="mode-content" id="excel2csvMode">
             <div class="upload-zone" id="excelDropZone">
-                <div class="upload-icon">📂</div>
+                <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
                 <p class="upload-text">拖放 Excel 文件到此处</p>
                 <p class="upload-hint">或点击选择文件（.xlsx / .xls）</p>
                 <input type="file" id="excelFileInput" accept=".xlsx,.xls" hidden>
@@ -106,20 +107,20 @@
                 <button id="excelRemoveBtn" class="btn-remove">✕</button>
             </div>
 
-            <button id="excelConvertBtn" class="btn btn-primary hidden">🚀 转换为 CSV</button>
+            <button id="excelConvertBtn" class="btn btn-primary hidden">转换为 CSV</button>
             <div id="excelProgress" class="progress hidden">
                 <div class="progress-bar" id="excelProgressBar"></div>
                 <p id="excelStatusText">转换中...</p>
             </div>
             <div id="excelError" class="error hidden"></div>
             <div id="excelResult" class="result hidden">
-                <p>✅ 转换完成！</p>
-                <a id="excelDownloadLink" class="btn btn-success" download>📥 下载 CSV</a>
+                <p>{{ icon('circle-check', 20) }} 转换完成！</p>
+                <a id="excelDownloadLink" class="btn btn-success" download>{{ icon('download', 16) }} 下载 CSV</a>
             </div>
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -172,22 +173,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/xls-to-xlsx" class="related-tool-card">
-            <span class="related-tool-icon">📊</span>
+            <span class="related-tool-icon">{{ icon('table', 24) }}</span>
             <span class="related-tool-name">XLS 转 XLSX</span>
         </a>
         <a href="/json-tool" class="related-tool-card">
-            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
             <span class="related-tool-name">JSON 格式化</span>
         </a>
         <a href="/pdf-merge" class="related-tool-card">
-            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-icon">{{ icon('files', 24) }}</span>
             <span class="related-tool-name">PDF 合并</span>
         </a>
         <a href="/timestamp" class="related-tool-card">
-            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
             <span class="related-tool-name">时间戳转换</span>
         </a>
     </div>

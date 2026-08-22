@@ -19,8 +19,8 @@
 
 .tool-textarea:focus {
     outline: none;
-    border-color: var(--primary-500);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    border-color: var(--primary-400);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 .tool-output {
@@ -56,7 +56,7 @@
 .tool-input:focus {
     border-color: var(--border-focus);
     background: white;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 .input-group {
@@ -122,33 +122,43 @@
     cursor: pointer;
     text-decoration: none;
     transition: var(--transition-fast);
-    box-shadow: var(--shadow-md);
 }
 
+.btn svg.icon { width: 17px; height: 17px; }
+
 .btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+    background: linear-gradient(180deg, var(--primary-500), var(--primary-600));
     color: white;
     width: 100%;
     margin-top: 20px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 4px 14px -4px rgba(79, 70, 229, 0.5);
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-    box-shadow: var(--shadow-lg);
+    background: linear-gradient(180deg, var(--primary-400), var(--primary-600));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 10px 24px -8px rgba(79, 70, 229, 0.55);
     transform: translateY(-1px);
 }
 
 .btn-success {
-    background: linear-gradient(135deg, var(--success-500), #059669);
+    background: linear-gradient(180deg, #34d399, var(--success-500));
     color: white;
     margin-top: 16px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 4px 14px -4px rgba(16, 185, 129, 0.45);
 }
 
 .btn-success:hover {
-    background: linear-gradient(135deg, #059669, #047857);
+    background: linear-gradient(180deg, #2fc790, #059669);
+    transform: translateY(-1px);
 }
 
 .btn-sm {
@@ -190,37 +200,71 @@
 
 /* ── 上传区域 ── */
 .upload-zone {
-    border: 2px dashed var(--gray-300);
-    border-radius: var(--radius-lg);
-    padding: 56px 24px;
+    border: 1.5px dashed var(--border-strong);
+    border-radius: var(--radius-xl);
+    padding: 44px 24px;
     text-align: center;
     cursor: pointer;
     transition: var(--transition-base);
-    background: white;
+    background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(99, 102, 241, 0.04), transparent),
+        var(--bg-card);
 }
 
 .upload-zone:hover {
     border-color: var(--primary-400);
-    background: var(--bg-card-hover);
+    background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(99, 102, 241, 0.07), transparent),
+        var(--bg-card);
     transform: scale(1.01);
 }
 
 .upload-zone.drag-over {
     border-color: var(--success-500);
-    background: #f0fdf4;
+    background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(16, 185, 129, 0.08), transparent),
+        #f0fdf4;
     border-style: solid;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
 }
 
 .upload-zone.has-file {
-    border-color: var(--primary-500);
-    background: #f0f9ff;
+    border-color: var(--primary-400);
+    background:
+        radial-gradient(ellipse 70% 80% at 50% 0%, rgba(99, 102, 241, 0.08), transparent),
+        var(--primary-light);
     border-style: solid;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
+/* 图标底座（圆形色块） */
 .upload-icon {
-    font-size: 52px;
-    margin-bottom: 16px;
-    display: block;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 16px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, var(--primary-50), var(--primary-100));
+    color: var(--primary-600);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 2px 8px -2px rgba(79, 70, 229, 0.25);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.upload-icon svg.icon {
+    width: 30px;
+    height: 30px;
+}
+
+.upload-zone:hover .upload-icon {
+    transform: translateY(-3px) scale(1.04);
+}
+
+.upload-zone.drag-over .upload-icon {
+    animation: pulse 1.2s ease infinite;
 }
 
 .upload-text {
@@ -327,20 +371,32 @@
 .progress {
     margin-top: 20px;
     background: var(--gray-100);
-    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     padding: 20px;
     text-align: center;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .progress-bar {
+    position: relative;
+    overflow: hidden;
     height: 8px;
     background: linear-gradient(90deg, var(--primary-500), var(--accent-500));
     border-radius: 4px;
     width: 0%;
     margin-bottom: 12px;
     transition: width 0.4s ease;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+/* 流光效果 */
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 1.4s ease infinite;
 }
 
 #statusText {
@@ -351,32 +407,38 @@
 
 /* ─�� 错误提示 ── */
 .error {
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    border: 1px solid #fecaca;
+    background: var(--cat-pdf-light);
+    border: 1px solid var(--cat-pdf-border);
     border-radius: var(--radius-md);
     padding: 14px 18px;
     margin-top: 16px;
-    color: #dc2626;
+    color: #be123c;
     font-size: 14px;
     font-weight: 500;
 }
 
 /* ── 结果显示 ── */
 .result {
-    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-    border: 1px solid #a7f3d0;
-    border-radius: var(--radius-md);
+    background: linear-gradient(160deg, var(--cat-excel-light), #f6fefb);
+    border: 1px solid var(--cat-excel-border);
+    border-radius: var(--radius-lg);
     padding: 24px;
     margin-top: 16px;
     text-align: center;
 }
 
 .result p {
-    font-size: 18px;
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 17px;
+    font-weight: 700;
     color: #065f46;
     margin-bottom: 16px;
 }
+
+.result p svg.icon { width: 20px; height: 20px; color: var(--success-500); }
 
 .result-box {
     background: white;
@@ -468,9 +530,9 @@
 
 .algo-option:has(input:checked) {
     border-color: var(--primary-500);
-    background: #eff6ff;
+    background: var(--primary-light);
     color: var(--primary-700);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
 }
 
 .algo-option input[type="radio"] { display: none; }
@@ -563,8 +625,8 @@
 .level-option.selected,
 .level-option:has(input:checked) {
     border-color: var(--primary-500);
-    background: #eff6ff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    background: var(--primary-light);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
 }
 
 .level-option input[type="radio"] { display: none; }
@@ -572,11 +634,16 @@
 .level-info { flex: 1; }
 
 .level-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
     font-size: 15px;
     font-weight: 700;
     color: var(--gray-800);
     margin-bottom: 4px;
 }
+
+.level-title svg.icon { width: 16px; height: 16px; color: var(--gray-500); }
 
 .level-desc {
     font-size: 13px;
@@ -594,6 +661,21 @@
     border-radius: var(--radius-sm);
     vertical-align: middle;
     margin-left: 6px;
+}
+
+/* ── 成功态输出框 ── */
+.tool-textarea.output-success {
+    background: var(--cat-excel-light);
+    border-color: var(--cat-excel-border);
+}
+
+/* ── 参数面板卡片 ── */
+.panel-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-top: 16px;
 }
 
 /* ── 密码组 ── */
@@ -624,7 +706,7 @@
 .password-group input[type="password"]:focus {
     border-color: var(--border-focus);
     background: white;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 .password-hint {
@@ -756,14 +838,19 @@
 
 /* ── 提示区块 ── */
 .tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
     padding: 12px 16px;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
+    background: var(--cat-qr-light);
+    border: 1px solid var(--cat-qr-border);
     border-radius: var(--radius-md);
     font-size: 13px;
     color: #92400e;
     margin-bottom: 16px;
 }
+
+.tip svg.icon { width: 15px; height: 15px; margin-top: 2px; color: #d97706; }
 
 /* ════════════════════════════════════════
    夜间模式
@@ -771,11 +858,27 @@
 
 [data-theme="dark"] .upload-zone {
     background: var(--bg-card);
-    border-color: var(--border-color);
+    border-color: var(--border-strong);
 }
 
 [data-theme="dark"] .upload-zone:hover {
-    background: var(--bg-card-hover);
+    border-color: var(--primary-400);
+}
+
+[data-theme="dark"] .upload-zone.drag-over {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+[data-theme="dark"] .upload-zone.has-file {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="dark"] .upload-icon {
+    background: linear-gradient(160deg, rgba(99, 102, 241, 0.22), rgba(99, 102, 241, 0.1));
+    color: var(--primary-400);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 2px 8px -2px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .upload-text { color: var(--text-primary); }
@@ -804,11 +907,15 @@
 }
 
 [data-theme="dark"] .btn-sm {
-    background: #333;
-    color: #e5e5e5;
+    background: var(--gray-100);
+    border-color: var(--border-color);
+    color: var(--gray-600);
 }
 
-[data-theme="dark"] .btn-sm:hover { background: #444; }
+[data-theme="dark"] .btn-sm:hover {
+    background: var(--gray-200);
+    color: var(--text-primary);
+}
 
 [data-theme="dark"] .note {
     background: var(--bg-card);
@@ -819,20 +926,20 @@
 [data-theme="dark"] .note li { color: var(--text-secondary); }
 
 [data-theme="dark"] .file-info {
-    background: linear-gradient(135deg, #1e3a5f, #172554);
-    border-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(30, 58, 138, 0.28));
+    border-color: rgba(59, 130, 246, 0.45);
 }
 
-[data-theme="dark"] .progress { background: #2a2a2a; }
+[data-theme="dark"] .progress { background: var(--gray-100); border-color: var(--border-color); }
 
 [data-theme="dark"] .result {
-    background: linear-gradient(135deg, #064e3b, #065f46);
-    border-color: #10b981;
+    background: linear-gradient(160deg, rgba(6, 78, 59, 0.5), rgba(6, 95, 70, 0.35));
+    border-color: rgba(16, 185, 129, 0.4);
 }
 
 [data-theme="dark"] .error {
-    background: linear-gradient(135deg, #7f1d1d, #991b1b);
-    border-color: #ef4444;
+    background: linear-gradient(160deg, rgba(127, 29, 29, 0.55), rgba(153, 27, 27, 0.4));
+    border-color: rgba(239, 68, 68, 0.4);
 }
 
 [data-theme="dark"] .password-group input[type="password"] {
@@ -876,7 +983,7 @@
 [data-theme="dark"] .algo-option:hover { background: var(--bg-card-hover); }
 
 [data-theme="dark"] .algo-option:has(input:checked) {
-    background: rgba(59, 130, 246, 0.15);
+    background: rgba(99, 102, 241, 0.18);
     border-color: var(--border-focus);
     color: var(--primary-500);
 }
@@ -941,9 +1048,21 @@
 }
 
 [data-theme="dark"] .tip {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.28);
     color: #fbbf24;
+}
+
+[data-theme="dark"] .tip svg.icon { color: #fbbf24; }
+
+[data-theme="dark"] .tool-textarea.output-success {
+    background: rgba(6, 78, 59, 0.35);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+[data-theme="dark"] .panel-card {
+    background: var(--bg-card);
+    border-color: var(--border-color);
 }
 
 [data-theme="dark"] .ocr-label { color: var(--text-secondary); }

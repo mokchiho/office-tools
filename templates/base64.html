@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.base64.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.base64.title,
         description=seo_meta.base64.description,
@@ -28,41 +29,41 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page code-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon code">🔤</div>
+            <div class="tool-icon code">{{ icon('type', 22) }}</div>
             Base64 编解码
         </h1>
         <p class="page-desc">文本与 Base64 互转，<strong>支持中文（UTF-8）</strong>。<br>
         全部在浏览器本地处理，<strong>不经过服务器</strong>，保护您的数据安全。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 浏览器本地处理</span>
-            <span class="trust-bar-item">📦 不上传服务器</span>
-            <span class="trust-bar-item">⏱ 实时转换</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 浏览器本地处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 不上传服务器</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 实时转换</span>
         </div>
 
 
         <div class="tool-section">
             <div class="tool-tabs">
-                <button class="tool-tab active" data-tab="encode">🔐 编码</button>
-                <button class="tool-tab" data-tab="decode">🔓 解码</button>
+                <button class="tool-tab active" data-tab="encode">{{ icon('lock', 15) }} 编码</button>
+                <button class="tool-tab" data-tab="decode">{{ icon('unlock', 15) }} 解码</button>
             </div>
 
             <div id="tab-encode" class="tab-content active">
@@ -70,15 +71,15 @@
                     <label class="input-label">输入文本</label>
                     <textarea id="encodeInput" class="tool-textarea" rows="4" placeholder="输入要编码的文本..."></textarea>
                     <div class="btn-row">
-                        <button id="encodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 编码 → Base64</button>
-                        <button id="encodeClear" class="btn-sm">🗑 清空</button>
+                        <button id="encodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">编码 → Base64</button>
+                        <button id="encodeClear" class="btn-sm">清空</button>
                     </div>
                 </div>
                 <div class="input-group">
                     <label class="input-label">Base64 结果</label>
-                    <textarea id="encodeOutput" class="tool-textarea" rows="4" readonly placeholder="Base64 编码结果..." onclick="this.select()" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <textarea id="encodeOutput" class="tool-textarea output-success" rows="4" readonly placeholder="Base64 编码结果..." onclick="this.select()"></textarea>
                     <div class="btn-row">
-                        <button id="encodeCopy" class="btn-sm">📋 复制结果</button>
+                        <button id="encodeCopy" class="btn-sm">{{ icon('clipboard', 14) }} 复制结果</button>
                         <span id="encodeStats" style="font-size:13px;color:#64748b;line-height:40px;"></span>
                     </div>
                 </div>
@@ -89,15 +90,15 @@
                     <label class="input-label">输入 Base64</label>
                     <textarea id="decodeInput" class="tool-textarea" rows="4" placeholder="输入 Base64 字符串..."></textarea>
                     <div class="btn-row">
-                        <button id="decodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">✨ 解码 → 文本</button>
-                        <button id="decodeClear" class="btn-sm">🗑 清空</button>
+                        <button id="decodeBtn" class="btn btn-primary" style="margin-top:0;width:auto;padding:10px 24px;">解码 → 文本</button>
+                        <button id="decodeClear" class="btn-sm">清空</button>
                     </div>
                 </div>
                 <div class="input-group">
                     <label class="input-label">解码结果</label>
-                    <textarea id="decodeOutput" class="tool-textarea" rows="4" readonly placeholder="解码后的文本..." onclick="this.select()" style="background: #f0fdf4; border-color: #86efac;"></textarea>
+                    <textarea id="decodeOutput" class="tool-textarea output-success" rows="4" readonly placeholder="解码后的文本..." onclick="this.select()"></textarea>
                     <div class="btn-row">
-                        <button id="decodeCopy" class="btn-sm">📋 复制结果</button>
+                        <button id="decodeCopy" class="btn-sm">{{ icon('clipboard', 14) }} 复制结果</button>
                         <span id="decodeError" class="tool-error-msg" style="font-size:13px;line-height:40px;color:#ef4444;"></span>
                     </div>
                 </div>
@@ -105,7 +106,7 @@
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -159,22 +160,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/json-tool" class="related-tool-card">
-            <span class="related-tool-icon">{ }</span>
+            <span class="related-tool-icon">{{ icon('braces', 24) }}</span>
             <span class="related-tool-name">JSON 格式化</span>
         </a>
         <a href="/hash-check" class="related-tool-card">
-            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-icon">{{ icon('hash', 24) }}</span>
             <span class="related-tool-name">文件哈希校验</span>
         </a>
         <a href="/timestamp" class="related-tool-card">
-            <span class="related-tool-icon">⏱</span>
+            <span class="related-tool-icon">{{ icon('clock', 24) }}</span>
             <span class="related-tool-name">时间戳转换</span>
         </a>
         <a href="/qrcode" class="related-tool-card">
-            <span class="related-tool-icon">📱</span>
+            <span class="related-tool-icon">{{ icon('qr-code', 24) }}</span>
             <span class="related-tool-name">二维码生成</span>
         </a>
     </div>
@@ -251,8 +252,8 @@
             if (!encodeOutput.value) return;
             navigator.clipboard.writeText(encodeOutput.value).then(() => {
                 const btn = document.getElementById('encodeCopy');
-                btn.textContent = '✅ 已复制';
-                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+                btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+                setTimeout(() => btn.innerHTML = window.toolIcon('clipboard') + ' 复制结果', 1500);
             });
         });
 
@@ -270,7 +271,7 @@
                 decodeError.textContent = '';
             } catch (e) {
                 decodeOutput.value = '';
-                decodeError.textContent = '⚠️ ' + e.message;
+                decodeError.textContent = '' + e.message;
             }
         }
 
@@ -292,8 +293,8 @@
             if (!decodeOutput.value) return;
             navigator.clipboard.writeText(decodeOutput.value).then(() => {
                 const btn = document.getElementById('decodeCopy');
-                btn.textContent = '✅ 已复制';
-                setTimeout(() => btn.textContent = '📋 复制结果', 1500);
+                btn.innerHTML = window.toolIcon('circle-check') + ' 已复制';
+                setTimeout(() => btn.innerHTML = window.toolIcon('clipboard') + ' 复制结果', 1500);
             });
         });
 </script>

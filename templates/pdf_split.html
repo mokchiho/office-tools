@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.pdf_split.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.pdf_split.title,
         description=seo_meta.pdf_split.description,
@@ -28,39 +29,39 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page pdf-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon pdf">✂️</div>
+            <div class="tool-icon pdf">{{ icon('scissors', 22) }}</div>
             PDF 拆分
         </h1>
         <p class="page-desc">从 PDF 中提取指定页面，<strong>合并为一个新 PDF 文件</strong>。<br>
         支持连续区间��如 <code>1-5</code>）和离散页码（如 <code>1,3,5</code>）混合使用。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 服务器端处理</span>
-            <span class="trust-bar-item">📦 任意页数</span>
-            <span class="trust-bar-item">⏱ 30分钟清理</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 服务器端处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 任意页数</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 30分钟清理</span>
         </div>
 
 
         <div class="upload-zone" id="dropZone">
-            <div class="upload-icon">📂</div>
+            <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
             <p class="upload-text">拖放 PDF 文件到此处</p>
             <p class="upload-hint">或点击选择文件</p>
             <input type="file" id="fileInput" accept=".pdf" hidden>
@@ -89,7 +90,7 @@
         </div>
 
         <button id="convertBtn" class="btn btn-primary hidden">
-            🚀 开始拆分
+            开始拆分
         </button>
 
         <div id="progress" class="progress hidden">
@@ -100,12 +101,12 @@
         <div id="error" class="error hidden"></div>
 
         <div id="result" class="result hidden">
-            <p>✅ 拆分完成！</p>
-            <a id="downloadLink" class="btn btn-success" download>📥 下载拆分后的 PDF</a>
+            <p>{{ icon('circle-check', 20) }} 拆分完成！</p>
+            <a id="downloadLink" class="btn btn-success" download>{{ icon('download', 16) }} 下载拆分后的 PDF</a>
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -159,22 +160,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/pdf-merge" class="related-tool-card">
-            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-icon">{{ icon('files', 24) }}</span>
             <span class="related-tool-name">PDF 合并</span>
         </a>
         <a href="/pdf-compress" class="related-tool-card">
-            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-icon">{{ icon('package', 24) }}</span>
             <span class="related-tool-name">PDF 压缩</span>
         </a>
         <a href="/pdf-to-word" class="related-tool-card">
-            <span class="related-tool-icon">📄</span>
+            <span class="related-tool-icon">{{ icon('file-text', 24) }}</span>
             <span class="related-tool-name">PDF 转 Word</span>
         </a>
         <a href="/pdf-watermark" class="related-tool-card">
-            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-icon">{{ icon('droplets', 24) }}</span>
             <span class="related-tool-name">PDF 加水印</span>
         </a>
     </div>
@@ -270,7 +271,7 @@
 
             isConverting = true;
             convertBtn.disabled = true;
-            convertBtn.innerHTML = '⏳ 拆分中...';
+            convertBtn.innerHTML = '拆分中...';
             hide(errorDiv);
             hide(resultDiv);
             progressBar.style.width = '0%';
@@ -294,7 +295,7 @@
                 const blob = await resp.blob();
                 const url = URL.createObjectURL(blob);
                 progressBar.style.width = '100%';
-                statusText.textContent = '完成 ✅';
+                statusText.textContent = '已完成';
 
                 const disp = resp.headers.get('Content-Disposition') || '';
                 const match = disp.match(/filename="?([^";]+)"?/);
@@ -309,7 +310,7 @@
             } finally {
                 isConverting = false;
                 convertBtn.disabled = false;
-                convertBtn.innerHTML = '🚀 开始拆分';
+                convertBtn.innerHTML = '开始拆分';
             }
         });
 </script>

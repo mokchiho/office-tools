@@ -35,15 +35,16 @@
 }
 
 .type-tab.active {
-    background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
-    color: white;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
-    transform: translateY(-1px);
+    background: var(--bg-card);
+    color: var(--primary-600);
+    box-shadow:
+        var(--shadow-sm),
+        inset 0 0 0 1px var(--primary-200);
 }
 
 .type-tab.active:hover {
-    background: linear-gradient(135deg, var(--primary-600), var(--accent-600));
-    color: white;
+    background: var(--bg-card);
+    color: var(--primary-600);
 }
 
 .type-content {
@@ -127,7 +128,7 @@
 .qr-select:focus {
     border-color: var(--primary-500);
     background: white;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 /* ── 左右两栏网格 ── */
@@ -237,14 +238,25 @@
 .color-text-input:focus {
     border-color: var(--primary-500);
     background: white;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
 }
 
 /* ════════════════════════════════════════
    夜间模式
    ════════════════════════════════════════ */
 
-[data-theme="dark"] .type-tabs { background: #2a2a2a; }
+[data-theme="dark"] .type-tabs {
+    background: var(--gray-100);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .type-tab.active {
+    background: var(--bg-card-hover);
+    color: var(--primary-400);
+    box-shadow:
+        var(--shadow-sm),
+        inset 0 0 0 1px var(--border-strong);
+}
 
 [data-theme="dark"] .option-section {
     background: var(--bg-card);
@@ -279,7 +291,7 @@
 }
 
 [data-theme="dark"] .qr-canvas-wrap {
-    background: repeating-conic-gradient(#1a1a1a 0% 25%, #232323 0% 50%) 50% / 16px 16px;
+    background: repeating-conic-gradient(#141926 0% 25%, #1a2030 0% 50%) 50% / 16px 16px;
 }
 
 [data-theme="dark"] .qr-canvas-wrap img { background: white; }

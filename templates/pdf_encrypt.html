@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ seo_meta.pdf_encrypt.title }}</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.pdf_encrypt.title,
         description=seo_meta.pdf_encrypt.description,
@@ -28,46 +29,46 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
         
         <div class="navbar-search">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" placeholder="搜索工具... (如: PDF转换、图片压缩)">
         </div>
         
         <div class="navbar-actions">
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
     <!-- 工具页面 -->
     <div class="tool-page pdf-page">
-        <a href="/" class="back-link">← 返回工具集</a>
+        <a href="/" class="back-link">{{ icon('arrow-left', 14) }} 返回工具集</a>
         
         <h1>
-            <div class="tool-icon security">🔒</div>
+            <div class="tool-icon security">{{ icon('lock', 22) }}</div>
             PDF 加密/解密
         </h1>
         <p class="page-desc">为 PDF 文件<strong>设置密码保护</strong>或<strong>解除密码限制</strong>。<br>
         加密后的 PDF 需要输入密码才能打开；解密后可移除密码限制。</p>
         <div class="trust-bar">
-            <span class="trust-bar-item">🔒 服务器端处理</span>
-            <span class="trust-bar-item">📦 最大 200MB</span>
-            <span class="trust-bar-item">⏱ 30分钟清理</span>
+            <span class="trust-bar-item">{{ icon('shield-check', 14) }} 服务器端处理</span>
+            <span class="trust-bar-item">{{ icon('package', 14) }} 最大 200MB</span>
+            <span class="trust-bar-item">{{ icon('clock', 14) }} 30分钟清理</span>
         </div>
 
 
         <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="encrypt">🔐 加密 PDF</button>
-            <button class="mode-tab" data-mode="decrypt">🔓 解密 PDF</button>
+            <button class="mode-tab active" data-mode="encrypt">{{ icon('lock', 15) }} 加密 PDF</button>
+            <button class="mode-tab" data-mode="decrypt">{{ icon('unlock', 15) }} 解密 PDF</button>
         </div>
 
         <!-- 加密模式 -->
         <div class="mode-content active" id="encryptMode">
             <div class="upload-zone" id="encryptDropZone">
-                <div class="upload-icon">📂</div>
+                <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
                 <p class="upload-text">拖放 PDF 文件到此处</p>
                 <p class="upload-hint">或点击选择文件</p>
                 <input type="file" id="encryptFileInput" accept=".pdf" hidden>
@@ -81,32 +82,32 @@
 
             <div id="encryptParams" class="hidden" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:16px;">
                 <div class="password-group">
-                    <label>🔑 打开密码（必填）</label>
+                    <label>{{ icon('key-round', 14) }} 打开密码（必填）</label>
                     <input type="password" id="encryptPassword" placeholder="设置打开 PDF 所需的密码">
                 </div>
                 <div class="password-group">
-                    <label>🛡️ 所有者密码（可选）</label>
+                    <label>{{ icon('shield-check', 14) }} 所有者密码（可选）</label>
                     <input type="password" id="ownerPassword" placeholder="用于控制编辑/打印权限">
                     <p class="password-hint">可选，用于限制编辑、打印等权限</p>
                 </div>
             </div>
 
-            <button id="encryptBtn" class="btn btn-primary hidden">🔐 加密 PDF</button>
+            <button id="encryptBtn" class="btn btn-primary hidden">加密 PDF</button>
             <div id="encryptProgress" class="progress hidden">
                 <div class="progress-bar" id="encryptProgressBar"></div>
                 <p id="encryptStatusText">加密中...</p>
             </div>
             <div id="encryptError" class="error hidden"></div>
             <div id="encryptResult" class="result hidden">
-                <p>✅ 加密完成！</p>
-                <a id="encryptDownloadLink" class="btn btn-success" download>📥 下载加密 PDF</a>
+                <p>{{ icon('circle-check', 20) }} 加密完成！</p>
+                <a id="encryptDownloadLink" class="btn btn-success" download>{{ icon('download', 16) }} 下载加密 PDF</a>
             </div>
         </div>
 
         <!-- 解密模式 -->
         <div class="mode-content" id="decryptMode">
             <div class="upload-zone" id="decryptDropZone">
-                <div class="upload-icon">📂</div>
+                <div class="upload-icon">{{ icon('upload-cloud', 30) }}</div>
                 <p class="upload-text">拖放加密的 PDF 文件到此处</p>
                 <p class="upload-hint">或点击选择文件</p>
                 <input type="file" id="decryptFileInput" accept=".pdf" hidden>
@@ -120,25 +121,25 @@
 
             <div id="decryptParams" class="hidden" style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:16px;">
                 <div class="password-group">
-                    <label>🔑 PDF 密码</label>
+                    <label>{{ icon('key-round', 14) }} PDF 密码</label>
                     <input type="password" id="decryptPassword" placeholder="输入打开 PDF 的密码">
                 </div>
             </div>
 
-            <button id="decryptBtn" class="btn btn-primary hidden">🔓 解密 PDF</button>
+            <button id="decryptBtn" class="btn btn-primary hidden">解密 PDF</button>
             <div id="decryptProgress" class="progress hidden">
                 <div class="progress-bar" id="decryptProgressBar"></div>
                 <p id="decryptStatusText">解密中...</p>
             </div>
             <div id="decryptError" class="error hidden"></div>
             <div id="decryptResult" class="result hidden">
-                <p>✅ 解密完成！</p>
-                <a id="decryptDownloadLink" class="btn btn-success" download>📥 下载解密 PDF</a>
+                <p>{{ icon('circle-check', 20) }} 解密完成！</p>
+                <a id="decryptDownloadLink" class="btn btn-success" download>{{ icon('download', 16) }} 下载解密 PDF</a>
             </div>
         </div>
 
         <section class="faq">
-            <h2>❓ 常见问题</h2>
+            <h2>{{ icon('circle-help', 18) }} 常见问题</h2>
             <div class="note">
             <h3>使用说明</h3>
             <ul>
@@ -191,22 +192,22 @@
 </script>
 
             <section class="related-tools" aria-label="相关工具">
-    <h2>🔗 相关工具</h2>
+    <h2>{{ icon('link', 18) }} 相关工具</h2>
     <div class="related-tools-grid">
         <a href="/pdf-watermark" class="related-tool-card">
-            <span class="related-tool-icon">💧</span>
+            <span class="related-tool-icon">{{ icon('droplets', 24) }}</span>
             <span class="related-tool-name">PDF 加水印</span>
         </a>
         <a href="/pdf-compress" class="related-tool-card">
-            <span class="related-tool-icon">📦</span>
+            <span class="related-tool-icon">{{ icon('package', 24) }}</span>
             <span class="related-tool-name">PDF 压缩</span>
         </a>
         <a href="/pdf-merge" class="related-tool-card">
-            <span class="related-tool-icon">📚</span>
+            <span class="related-tool-icon">{{ icon('files', 24) }}</span>
             <span class="related-tool-name">PDF 合并</span>
         </a>
         <a href="/hash-check" class="related-tool-card">
-            <span class="related-tool-icon">🔐</span>
+            <span class="related-tool-icon">{{ icon('hash', 24) }}</span>
             <span class="related-tool-name">文件哈希校验</span>
         </a>
     </div>

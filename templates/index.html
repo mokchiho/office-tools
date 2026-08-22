@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>办公效率工具集 - 免费在线PDF/图片/编码转换工具</title>
     {% import '_seo.html' as seo_macros %}
+    {% from '_icons.html' import icon %}
     {{ seo_macros.head(
         title=seo_meta.index.title,
         description=seo_meta.index.description,
@@ -47,19 +48,19 @@
     <!-- 顶部导航 -->
     <nav class="navbar">
         <a href="/" class="navbar-brand">
-            <div class="navbar-brand-icon">🛠</div>
+            <div class="navbar-brand-icon">{{ icon('wrench', 17) }}</div>
             <span class="navbar-brand-text">办公工具集</span>
         </a>
 
         <div class="navbar-search" id="navSearch">
-            <span class="navbar-search-icon">🔍</span>
+            <span class="navbar-search-icon">{{ icon('search', 15) }}</span>
             <input type="text" id="searchInput" placeholder="搜索工具..." readonly>
             <kbd>Ctrl+K</kbd>
         </div>
 
         <div class="navbar-actions">
-            <button class="btn-icon" id="searchBtn" title="搜索 (Ctrl+K)">🔍</button>
-            <button class="btn-icon" title="夜间模式">🌙</button>
+            <button class="btn-icon" id="searchBtn" title="搜索 (Ctrl+K)">{{ icon('search', 16) }}</button>
+            <button class="btn-icon" title="夜间模式">{{ icon('moon', 16) }}</button>
         </div>
     </nav>
 
@@ -67,7 +68,7 @@
     <div class="search-overlay" id="searchOverlay">
         <div class="search-modal">
             <div class="search-modal-input-wrap">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon">{{ icon('search', 18) }}</span>
                 <input type="text" class="search-modal-input" id="modalSearchInput" placeholder="搜索工具..." autofocus>
             </div>
             <div class="search-results" id="searchResults"></div>
@@ -77,8 +78,8 @@
 
     <!-- 页面头部 -->
     <div class="page-header">
-        <h1>🧰 办公效率工具集</h1>
-        <p class="header-subtitle">免费 · 免注册 · 隐私优先<br>15 款常用办公工具，一键在线使用</p>
+        <h1>办公效率工具集</h1>
+        <p class="header-subtitle">免费 · 免注册 · 隐私优先<br>18 款常用办公工具，一键在线使用</p>
         <div class="header-stats">
             <span class="header-stat">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -99,22 +100,25 @@
     <div class="container">
         <div class="category-tabs">
             <button class="category-tab active" data-category="all">
-                <span class="category-tab-icon">✨</span> 全部工具
+                <span class="category-tab-icon">{{ icon('sparkles', 15) }}</span> 全部工具
             </button>
             <button class="category-tab" data-category="pdf">
-                <span class="category-tab-icon">📄</span> PDF 工具
+                <span class="category-tab-icon">{{ icon('file-text', 15) }}</span> PDF 工具
             </button>
             <button class="category-tab" data-category="excel">
-                <span class="category-tab-icon">📊</span> Excel/CSV
+                <span class="category-tab-icon">{{ icon('table', 15) }}</span> Excel/CSV
             </button>
             <button class="category-tab" data-category="image">
-                <span class="category-tab-icon">🖼️</span> 图片处理
+                <span class="category-tab-icon">{{ icon('image', 15) }}</span> 图片处理
             </button>
             <button class="category-tab" data-category="code">
-                <span class="category-tab-icon">💻</span> 编码转换
+                <span class="category-tab-icon">{{ icon('terminal', 15) }}</span> 编码转换
             </button>
             <button class="category-tab" data-category="qrcode">
-                <span class="category-tab-icon">📱</span> 二维码
+                <span class="category-tab-icon">{{ icon('qr-code', 15) }}</span> 二维码
+            </button>
+            <button class="category-tab" data-category="security">
+                <span class="category-tab-icon">{{ icon('shield-check', 15) }}</span> 安全工具
             </button>
         </div>
 
@@ -123,21 +127,21 @@
             <!-- PDF 工具 -->
             <a href="/pdf-to-word" class="tool-card" data-category="pdf" data-name="PDF转Word" data-desc="PDF转Word，支持OCR识别扫描件">
                 <div class="tool-card-header">
-                    <div class="tool-icon pdf">📄</div>
+                    <div class="tool-icon pdf">{{ icon('file-text', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 转 Word</div>
                         <div class="tool-desc">将 PDF 转换为可编辑的 Word 文档，支持 OCR 识别扫描件</div>
                     </div>
                 </div>
                 <div class="tool-card-footer">
-                    <span class="tool-badge hot">🔥 热门</span>
+                    <span class="tool-badge hot">热门</span>
                     <span>PDF → DOCX</span>
                 </div>
             </a>
 
             <a href="/pdf-merge" class="tool-card" data-category="pdf" data-name="PDF合并" data-desc="多PDF文件合并为一个">
                 <div class="tool-card-header">
-                    <div class="tool-icon pdf">📚</div>
+                    <div class="tool-icon pdf">{{ icon('files', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 合并</div>
                         <div class="tool-desc">将多个 PDF 文件合并为一个，支持拖拽调整顺序</div>
@@ -151,7 +155,7 @@
 
             <a href="/pdf-split" class="tool-card" data-category="pdf" data-name="PDF拆分" data-desc="从PDF中提取指定页面">
                 <div class="tool-card-header">
-                    <div class="tool-icon pdf">✂️</div>
+                    <div class="tool-icon pdf">{{ icon('scissors', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 拆分</div>
                         <div class="tool-desc">从 PDF 中提取指定页面，生成新的 PDF 文件</div>
@@ -164,7 +168,7 @@
 
             <a href="/pdf-compress" class="tool-card" data-category="pdf" data-name="PDF压缩" data-desc="减小PDF体积，适合扫描件优化">
                 <div class="tool-card-header">
-                    <div class="tool-icon pdf">📦</div>
+                    <div class="tool-icon pdf">{{ icon('package', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 压缩</div>
                         <div class="tool-desc">通过图像降采样减小 PDF 体积，适合扫描件优化</div>
@@ -178,7 +182,7 @@
 
             <a href="/pdf-watermark" class="tool-card" data-category="pdf" data-name="PDF加水印" data-desc="为PDF添加文字水印">
                 <div class="tool-card-header">
-                    <div class="tool-icon pdf">💧</div>
+                    <div class="tool-icon pdf">{{ icon('droplets', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 加水印</div>
                         <div class="tool-desc">为 PDF 添加平铺文字水印，支持自定义字体、大小、透明度</div>
@@ -191,7 +195,7 @@
 
             <a href="/pdf-encrypt" class="tool-card" data-category="pdf" data-name="PDF加密解密" data-desc="为PDF设置密码保护">
                 <div class="tool-card-header">
-                    <div class="tool-icon security">🔒</div>
+                    <div class="tool-icon security">{{ icon('lock', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">PDF 加密/解密</div>
                         <div class="tool-desc">为 PDF 设置密码保护或移除密码限制，保护文档安全</div>
@@ -205,7 +209,7 @@
             <!-- Excel/CSV 工具 -->
             <a href="/xls-to-xlsx" class="tool-card" data-category="excel" data-name="XLS转XLSX" data-desc="Excel旧格式转新格式">
                 <div class="tool-card-header">
-                    <div class="tool-icon excel">📊</div>
+                    <div class="tool-icon excel">{{ icon('table', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">XLS 转 XLSX</div>
                         <div class="tool-desc">将 Excel 97-2003 格式转换为现代格式，完整保留格式和图片</div>
@@ -219,7 +223,7 @@
 
             <a href="/csv-excel" class="tool-card" data-category="excel" data-name="CSV转Excel" data-desc="CSV与Excel互相转换">
                 <div class="tool-card-header">
-                    <div class="tool-icon excel">🔄</div>
+                    <div class="tool-icon excel">{{ icon('arrow-right-left', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">CSV ↔ Excel 转换</div>
                         <div class="tool-desc">CSV 与 Excel 互相转换，自动识别编码，解决中文乱码</div>
@@ -233,7 +237,7 @@
 
             <a href="/zh-convert" class="tool-card" data-category="excel" data-name="简繁转换" data-desc="Office文档简繁转换">
                 <div class="tool-card-header">
-                    <div class="tool-icon excel">字</div>
+                    <div class="tool-icon excel">{{ icon('languages', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">Office 简繁转换</div>
                         <div class="tool-desc">Word/Excel/PPT 文档简体与繁体互相转换，完整保留原排版与字体</div>
@@ -248,7 +252,7 @@
             <!-- 图片处理工具 -->
             <a href="/image-compress" class="tool-card" data-category="image" data-name="图片压缩" data-desc="压缩JPG/PNG/WebP图片">
                 <div class="tool-card-header">
-                    <div class="tool-icon image">🖼️</div>
+                    <div class="tool-icon image">{{ icon('image', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">图片压缩</div>
                         <div class="tool-desc">压缩 JPG/PNG/WebP 图片，自定义质量和尺寸，减少文件大小</div>
@@ -262,7 +266,7 @@
 
             <a href="/image-convert" class="tool-card" data-category="image" data-name="图片格式转换" data-desc="图片格式间自由转换">
                 <div class="tool-card-header">
-                    <div class="tool-icon image">🔄</div>
+                    <div class="tool-icon image">{{ icon('arrow-right-left', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">图片格式转换</div>
                         <div class="tool-desc">在 JPG/PNG/WebP/BMP/GIF/TIFF 格式间自由转换</div>
@@ -275,7 +279,7 @@
 
             <a href="/images-to-pdf" class="tool-card" data-category="image" data-name="图片转PDF" data-desc="多张图片合并为PDF">
                 <div class="tool-card-header">
-                    <div class="tool-icon image">📑</div>
+                    <div class="tool-icon image">{{ icon('layers', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">图片转 PDF</div>
                         <div class="tool-desc">将多张图片合并为一个 PDF 文件，每张图片一页</div>
@@ -289,7 +293,7 @@
             <!-- 编码转换工具 -->
             <a href="/hash-check" class="tool-card" data-category="code" data-name="文件哈希校验" data-desc="计算文件MD5/SHA哈希值">
                 <div class="tool-card-header">
-                    <div class="tool-icon security">🔐</div>
+                    <div class="tool-icon security">{{ icon('hash', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">文件哈希校验</div>
                         <div class="tool-desc">计算文件的 MD5/SHA1/SHA256/SHA512 哈希值，验证文件完整性</div>
@@ -303,7 +307,7 @@
 
             <a href="/base64" class="tool-card" data-category="code" data-name="Base64编解码" data-desc="文本与Base64互转">
                 <div class="tool-card-header">
-                    <div class="tool-icon code">🔤</div>
+                    <div class="tool-icon code">{{ icon('type', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">Base64 编解码</div>
                         <div class="tool-desc">文本与 Base64 互转，支持 UTF-8 中文编码</div>
@@ -316,7 +320,7 @@
 
             <a href="/json-tool" class="tool-card" data-category="code" data-name="JSON格式化" data-desc="JSON美化压缩校验">
                 <div class="tool-card-header">
-                    <div class="tool-icon code">{ }</div>
+                    <div class="tool-icon code">{{ icon('braces', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">JSON 格式化</div>
                         <div class="tool-desc">JSON 美化、压缩、校验，定位语法错误位置</div>
@@ -330,7 +334,7 @@
 
             <a href="/timestamp" class="tool-card" data-category="code" data-name="时间戳转换" data-desc="Unix时间戳与日期互转">
                 <div class="tool-card-header">
-                    <div class="tool-icon code">⏱</div>
+                    <div class="tool-icon code">{{ icon('clock', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">时间戳转换</div>
                         <div class="tool-desc">Unix 时间戳与日期时间互转，支持秒/毫秒自动识别</div>
@@ -344,7 +348,7 @@
             <!-- 二维码工具 -->
             <a href="/qrcode" class="tool-card" data-category="qrcode" data-name="二维码生成" data-desc="生成文本网址WiFi二维码">
                 <div class="tool-card-header">
-                    <div class="tool-icon tool">📱</div>
+                    <div class="tool-icon tool">{{ icon('qr-code', 20) }}</div>
                     <div class="tool-info">
                         <div class="tool-name">二维码生成</div>
                         <div class="tool-desc">生成文本/网址/WiFi/邮箱/电话等多种二维码，支持 PNG 和 SVG 下载</div>
@@ -353,6 +357,48 @@
                 <div class="tool-card-footer">
                     <span class="tool-badge hot">多功能</span>
                     <span>矢量输出</span>
+                </div>
+            </a>
+
+            <!-- 安全工具 -->
+            <a href="/password-generator" class="tool-card" data-category="security" data-name="密码生成器" data-desc="生成高强度随机密码">
+                <div class="tool-card-header">
+                    <div class="tool-icon security">{{ icon('key-round', 20) }}</div>
+                    <div class="tool-info">
+                        <div class="tool-name">密码生成器</div>
+                        <div class="tool-desc">生成高强度随机密码，自定义长度和字符类型，支持批量生成，浏览器本地完成</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge hot">安全</span>
+                    <span>加密级随机</span>
+                </div>
+            </a>
+
+            <a href="/url-encode" class="tool-card" data-category="code" data-name="URL编解码" data-desc="URL编码解码转换工具">
+                <div class="tool-card-header">
+                    <div class="tool-icon code">{{ icon('link', 20) }}</div>
+                    <div class="tool-info">
+                        <div class="tool-name">URL 编解码</div>
+                        <div class="tool-desc">URL 编码与解码，支持 encodeURIComponent 和 encodeURI 两种模式，自动处理中文</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span>双向转换</span>
+                </div>
+            </a>
+
+            <a href="/uuid-generator" class="tool-card" data-category="code" data-name="UUID生成器" data-desc="批量生成UUID唯一标识符">
+                <div class="tool-card-header">
+                    <div class="tool-icon code">{{ icon('fingerprint', 20) }}</div>
+                    <div class="tool-info">
+                        <div class="tool-name">UUID 生成器</div>
+                        <div class="tool-desc">批量生成 UUID/GUID 唯一标识符，支持 4 种格式输出，加密级随机数</div>
+                    </div>
+                </div>
+                <div class="tool-card-footer">
+                    <span class="tool-badge">开发者</span>
+                    <span>v4 随机</span>
                 </div>
             </a>
         </div>
@@ -420,7 +466,7 @@
                 const name = card.querySelector('.tool-name').textContent;
                 const desc = card.querySelector('.tool-desc').textContent;
                 const href = card.href;
-                const icon = card.querySelector('.tool-icon').textContent;
+                const icon = card.querySelector('.tool-icon').innerHTML;
                 // 高亮匹配文字
                 const highlighted = kw
                     ? name.replace(new RegExp(kw, 'gi'), m => `<mark>${m}</mark>`)

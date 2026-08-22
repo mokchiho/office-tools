@@ -353,7 +353,7 @@ class TestGlobalConsistency(unittest.TestCase):
 
     def test_seo_meta_config_complete(self):
         """_SEO_META 应包含全部 17 个 slug, 且每个有 title/description/keywords/path"""
-        self.assertEqual(len(_SEO_META), 18, f"_SEO_META 应有 18 项, 实际 {len(_SEO_META)}")
+        self.assertEqual(len(_SEO_META), 21, f"_SEO_META 应有 21 项, 实际 {len(_SEO_META)}")
         for slug, meta in _SEO_META.items():
             for k in ("title", "description", "keywords"):
                 self.assertIn(k, meta, f"_SEO_META[{slug!r}] 缺 {k}")

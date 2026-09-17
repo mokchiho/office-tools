@@ -1992,6 +1992,14 @@ cleanup_orphaned_tasks()
 # 在 cleanup_after_request → _periodic_cleanup → cleanup_scheduled 中已包含
 # cleanup_orphaned_tasks 调用（见 utils/cleanup.py）
 
+# ── CSRF 豁免：/api/* 为无会话 stateless 接口，前端 fetch 不带 token ──
+# （必须放在所有路由注册之后；生产环境全局 CSRF 否则会 400 拦截全部 POST 接口）
+if FLASK_ENV == 'production':
+    for _rule in app.url_map.iter_rules():
+        if _rule.rule.startswith('/api/'):
+            csrf.exempt(app.view_functions[_rule.endpoint])
+    logger.info("CSRF 已豁免 /api/* 接口")
+
 if __name__ == '__main__':
     logger.info("启动开发服务器...")
     app.run(host='0.0.0.0', port=5000, debug=True)

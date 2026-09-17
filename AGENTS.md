@@ -3,8 +3,6 @@ description: 办公效率工具集 (office-tools) 专业开发代理 — Flask +
 mode: primary
 ---
 
-你是一个专业的软件开发代理，名称为 `Prometheus`。你运行在 YOLO 模式下：在不进行无意义确认的前提下，主动推进工作、快速执行、对结果负责。
-
 ## 项目概览
 
 **office-tools** 是一个轻量级办公文件格式转换 Web 应用。
@@ -26,70 +24,6 @@ mode: primary
 
 ## 核心架构约束
 
-### 应用结构
-
-```
-office-tools/
-├── app.py                    # Flask 主应用（路由、转换逻辑、清理任务）
-├── config.py                 # 配置中心（从环境变量读取）
-├── requirements.txt          # Python 依赖
-├── Dockerfile
-├── docker-compose.yml
-├── .env / .env.example       # 环境配置
-├── AGENTS.md                 # 本文
-├── DEPLOY.md                 # 部署运维文档
-├── start.sh                  # 本地开发启动脚本
-├── routes/                   # 路由包（预留模块化扩展）
-│   └── __init__.py
-├── services/                 # 业务服务层
-│   ├── __init__.py
-│   └── ocr_service.py        # OCR 异步识别服务（RapidOCR ONNX）
-├── utils/                    # 工具模块
-│   ├── __init__.py           # 核心模块入口，导出常用配置
-│   ├── cleanup.py            # 文件定时清理
-│   ├── download.py           # 下载响应构建器
-│   ├── file_check.py         # Magic Bytes 文件类型校验
-│   ├── logging_config.py     # 彩色日志配置
-│   └── rate_limit.py         # 速率限制
-├── templates/                # Jinja2 模板（共 16 个）
-│   ├── index.html            # 首页工具卡片网格 + 分类标签 + 搜索
-│   ├── _seo.html             # SEO 宏：head/breadcrumb/faq JSON-LD
-│   ├── _footer.html          # 全站页脚
-│   ├── pdf_to_word.html      # PDF→DOCX（含 OCR 模式）
-│   ├── xls_to_xlsx.html      # XLS→XLSX
-│   ├── pdf_merge.html        # PDF 合并
-│   ├── pdf_split.html        # PDF 拆分
-│   ├���─ pdf_compress.html     # PDF 压缩
-│   ├── pdf_watermark.html    # PDF 加水印
-│   ├── pdf_encrypt.html      # PDF 加密/解密
-│   ├── csv_excel.html        # CSV↔Excel
-│   ├── zh_convert.html       # Office 简繁转换
-│   ├── image_compress.html   # 图片压缩
-│   ├── image_convert.html    # 图片格式转换
-│   ├── images_to_pdf.html    # 图片转 PDF
-│   ├── hash_check.html       # 文件哈希校验（本地处理）
-│   ├── base64.html           # Base64 编解码
-│   ├── json_tool.html        # JSON 格式化
-│   ├── timestamp.html        # 时间戳转换
-│   └── qrcode.html           # 二维码生成
-├── static/
-│   ├── common.js             # 公共脚本（夜间模式切换）
-│   ├── favicon.svg
-│   └── css/
-│       ├── core.css          # 核心共享样式（CSS 变量、导航、工具页骨架）
-│       ├── index.css         # 首页样式（头部、标签、工具网格）
-│       ├── tools.css         # 转换工具页组件样式
-│       ├── seo.css           # SEO 样式（页脚、相关工具、FAQ）
-│       └── qrcode.css        # 二维码页专用样式
-├── uploads/                  # 上传临时文件（自动清理）
-├── output/                   # 转换结果文件（自动清理）
-├── logs/                     # 日志目录
-└── tests/                    # 测试目录
-    ├── __init__.py
-    ├── test_conversion.py
-    ├── test_seo.py
-    └── apply_seo.py
-```
 
 ### 代码约定
 
@@ -114,7 +48,7 @@ office-tools/
 - 从用户描述、现有代码中提炼目标；**显式检索受影响的文件和接口定义。**
 - 明确输入输出、失败场景、性能约束及**对现有功能的潜在冲击。**
 
-### 2. 制定可落地计���
+### 2. 制定可落地计划
 
 - 给出分步骤方案（变更点、测试策略、**回滚点**）。
 - 计划中必须包含对"如何证明功能已按预期工作"的具体描述。
@@ -141,5 +75,5 @@ office-tools/
 
 - **严禁静默失败：** 任何执行中的报错必须显式处理，不能跳过。
 - 发现需求冲突时，先给出基于最佳实践的默认建议并继续推进，除非该冲突会导致核心业务逻辑瘫痪。
-- 对外沟通：��果导向，拒绝冗长。
+- 对外沟通：结果导向，拒绝冗长。
 - 涉及部署时，请参考 DEPLOY.md 中的更新部署流程和回滚方案。
